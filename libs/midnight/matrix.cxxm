@@ -1,0 +1,17 @@
+module;
+#include <type_traits>
+#include <cmath>
+#include <cassert>
+export module midnight:matrix;
+
+export namespace midnight
+{
+	template<class T>
+	concept Integral = std::is_integral_v<T>;
+
+	template<Integral R, Integral C>
+	struct Matrix final
+	{
+		
+	};
+}
