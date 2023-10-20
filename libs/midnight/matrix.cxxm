@@ -2,16 +2,70 @@ module;
 #include <type_traits>
 #include <cmath>
 #include <cassert>
+#include <cstddef>
+#include <array>
+#include <initializer_list>
 export module midnight:matrix;
 
 export namespace midnight
 {
-	template<class T>
-	concept Integral = std::is_integral_v<T>;
-
-	template<Integral R, Integral C>
+	template<std::size_t R, std::size_t C, typename T>
 	struct Matrix final
 	{
-		
+	public:
+		// Matrix() = default;
+		// Matrix(const T fill);
+		// Matrix(const std::initializer_list<T> fill);
+		// Matrix(Matrix<R, C, T> &other);
+
+		T *entry(const std::size_t x, const std::size_t y);
+		T *entry(const std::size_t x, const std::size_t y) const;
+		auto getData();
+		auto getData() const;
+		std::size_t rows() const;
+		std::size_t columns() const;
+
+	private:
+		const std::size_t _length{R * C};
+		T data[R][C]{0};
 	};
+}
+
+export namespace midnight
+{
+	template<std::size_t R, std::size_t C, typename T>
+	T *Matrix<R, C, T>::entry(const std::size_t x, const std::size_t y)
+	{
+		return &data[x][y];
+	}
+
+	template<std::size_t R, std::size_t C, typename T>
+	T *Matrix<R, C, T>::entry(const std::size_t x, const std::size_t y) const
+	{
+		return &data[x][y];
+	}
+
+	template<std::size_t R, std::size_t C, typename T>
+	auto Matrix<R, C, T>::getData()
+	{
+		return data;
+	}
+
+	template<std::size_t R, std::size_t C, typename T>
+	auto Matrix<R, C, T>::getData() const
+	{
+		return data;
+	}
+
+	template<std::size_t R, std::size_t C, typename T>
+	std::size_t Matrix<R, C, T>::rows() const
+	{
+		return R;
+	}
+
+	template<std::size_t R, std::size_t C, typename T>
+	std::size_t Matrix<R, C, T>::columns() const
+	{
+		return C;
+	}
 }
