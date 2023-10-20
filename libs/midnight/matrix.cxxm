@@ -10,6 +10,19 @@ export module midnight:matrix;
 export namespace midnight
 {
 	template<std::size_t R, std::size_t C, typename T>
+	struct Matrix;
+
+	typedef Matrix<2, 1, float> Vector2;
+	typedef Matrix<3, 1, float> Vector3;
+	typedef Matrix<4, 1, float> Vector4;
+	typedef Matrix<2, 2, float> Matrix2x2;
+	typedef Matrix<3, 3, float> Matrix3x3;
+	typedef Matrix<4, 4, float> Matrix4x4;
+
+	template<std::size_t R, typename T>
+	float dot(const Matrix<R, 1, T> a, const Matrix<R, 1, T> b);
+
+	template<std::size_t R, std::size_t C, typename T>
 	struct Matrix final
 	{
 	public:
@@ -31,7 +44,7 @@ export namespace midnight
 		Matrix<R, C, T> operator*(const T other) const;
 
 		T &entry(const std::size_t x, const std::size_t y);
-		T &entry(const std::size_t x, const std::size_t y) const;
+		const T &entry(const std::size_t x, const std::size_t y) const;
 		auto &getData();
 		const auto &getData() const;
 		std::size_t rows() const;
@@ -41,6 +54,20 @@ export namespace midnight
 		const std::size_t length{R * C};
 		T data[R][C]{0};
 	};
+}
+
+export namespace midnight
+{
+	template<std::size_t R, typename T>
+	float dot(const Matrix<R, 1, T> a, const Matrix<R, 1, T> b)
+	{
+		float mod{0.0f};
+		for(int i{0}; i < R; ++i)
+		{
+			mod += a.entry(0, i) * b.entry(0, i);
+		}
+		return mod;
+	}
 }
 
 export namespace midnight
@@ -164,7 +191,7 @@ export namespace midnight
 	Matrix<R, OC, T> Matrix<R, C, T>::operator*(const Matrix<OR, OC, T> &other) const
 	{
 		Matrix<R, OC, T> mod{0};
-		// multiply
+		
 	}
 
 	template<std::size_t R, std::size_t C, typename T>
@@ -184,16 +211,16 @@ export namespace midnight
 	template<std::size_t R, std::size_t C, typename T>
 	T &Matrix<R, C, T>::entry(const std::size_t x, const std::size_t y)
 	{
-		assert(x < R && "Midnight, Matrix - x out of range");
-		assert(y < C && "Midnight, Matrix - y out of range");
+		assert(x < C && "Midnight, Matrix - x out of range");
+		assert(y < R && "Midnight, Matrix - y out of range");
 		return data[x][y];
 	}
 
 	template<std::size_t R, std::size_t C, typename T>
-	T &Matrix<R, C, T>::entry(const std::size_t x, const std::size_t y) const
+	const T &Matrix<R, C, T>::entry(const std::size_t x, const std::size_t y) const
 	{
-		assert(x < R && "Midnight, Matrix - x out of range");
-		assert(y < C && "Midnight, Matrix - y out of range");
+		assert(x < C && "Midnight, Matrix - x out of range");
+		assert(y < R && "Midnight, Matrix - y out of range");
 		return data[x][y];
 	}
 
