@@ -3,6 +3,7 @@ module;
 #include <cmath>
 #include <cassert>
 #include <cstddef>
+#include <cmath>
 #include <array>
 #include <initializer_list>
 #include <iostream>
@@ -26,7 +27,9 @@ export namespace midnight
 	typedef Matrix<4, 4, float> Matrix4x4;
 
 	template<std::size_t R, class T>
-	float dot(const Matrix<R, 1, T> a, const Matrix<R, 1, T> b);
+	float dot(const Matrix<R, 1, T> v1, const Matrix<R, 1, T> v2);
+	template<std::size_t R, class T>
+	float length(const Matrix<R, 1, T> v);
 
 	template<std::size_t R, std::size_t C, class T>
 	struct Matrix final
@@ -66,14 +69,20 @@ export namespace midnight
 export namespace midnight
 {
 	template<std::size_t R, class T>
-	float dot(const Matrix<R, 1, T> a, const Matrix<R, 1, T> b)
+	float dot(const Matrix<R, 1, T> v1, const Matrix<R, 1, T> v2)
 	{
 		float mod{0.0f};
 		for(int i{0}; i < R; ++i)
 		{
-			mod += a.entry(0, i) * b.entry(0, i);
+			mod += v1.entry(i, 0) * v2.entry(i, 0);
 		}
 		return mod;
+	}
+
+	template<std::size_t R, class T>
+	float length(const Matrix<R, 1, T> v)
+	{
+		return std::sqrt(dot(v, v));
 	}
 }
 
