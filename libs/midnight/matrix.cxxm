@@ -30,6 +30,8 @@ export namespace midnight
 	float dot(const Matrix<R, 1, T> v1, const Matrix<R, 1, T> v2);
 	template<std::size_t R, class T>
 	float length(const Matrix<R, 1, T> v);
+	template<std::size_t R, class T>
+	Matrix<R, 1, T> normalise(Matrix<R, 1, T> v);
 
 	template<std::size_t R, std::size_t C, class T>
 	struct Matrix final
@@ -83,6 +85,17 @@ export namespace midnight
 	float length(const Matrix<R, 1, T> v)
 	{
 		return std::sqrt(dot(v, v));
+	}
+
+	template<std::size_t R, class T>
+	Matrix<R, 1, T> normalise(Matrix<R, 1, T> v)
+	{
+		float l = length(v);
+		for(int i{0}; i < R; ++i)
+		{
+			v.entry(i, 0) /= l;
+		}
+		return v;
 	}
 }
 
