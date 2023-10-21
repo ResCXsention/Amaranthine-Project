@@ -5,11 +5,17 @@ module;
 #include <cstddef>
 #include <array>
 #include <initializer_list>
+#include <iostream>
+
+#define MIDNIGHT_ERROR_ROW_OUTRANGE "Midnight, row out of range"
+#define MIDNIGHT_ERROR_COLUMN_OUTRANGE "Midnight, column out of range"
+#define MIDNIGHT_ERROR_DIMENSION_MISMATCH "Midnight, dimensions incompatible"
+
 export module midnight:matrix;
 
 export namespace midnight
 {
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	struct Matrix;
 
 	typedef Matrix<2, 1, float> Vector2;
@@ -19,10 +25,10 @@ export namespace midnight
 	typedef Matrix<3, 3, float> Matrix3x3;
 	typedef Matrix<4, 4, float> Matrix4x4;
 
-	template<std::size_t R, typename T>
+	template<std::size_t R, class T>
 	float dot(const Matrix<R, 1, T> a, const Matrix<R, 1, T> b);
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	struct Matrix final
 	{
 	public:
@@ -43,12 +49,13 @@ export namespace midnight
 		Matrix<R, OC, T> operator*(const Matrix<OR, OC, T> &other) const;
 		Matrix<R, C, T> operator*(const T other) const;
 
-		T &entry(const std::size_t x, const std::size_t y);
-		const T &entry(const std::size_t x, const std::size_t y) const;
+		T &entry(const std::size_t r, const std::size_t c);
+		const T &entry(const std::size_t r, const std::size_t c) const;
 		auto &getData();
 		const auto &getData() const;
 		std::size_t rows() const;
 		std::size_t columns() const;
+		void write() const;
 
 	private:
 		const std::size_t length{R * C};
@@ -58,7 +65,7 @@ export namespace midnight
 
 export namespace midnight
 {
-	template<std::size_t R, typename T>
+	template<std::size_t R, class T>
 	float dot(const Matrix<R, 1, T> a, const Matrix<R, 1, T> b)
 	{
 		float mod{0.0f};
@@ -72,13 +79,13 @@ export namespace midnight
 
 export namespace midnight
 {
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	Matrix<R, C, T>::Matrix(const T fill)
 	{
 		data = {fill};
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	Matrix<R, C, T>::Matrix(const std::initializer_list<T> fill)
 	{
 		unsigned long i{0}, j{0};
@@ -94,7 +101,7 @@ export namespace midnight
 		}
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	Matrix<R, C, T>::Matrix(const Matrix<R, C, T> &other)
 	{
 		auto otherData{other.getData()};
@@ -107,7 +114,7 @@ export namespace midnight
 		}
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	Matrix<R, C, T> &Matrix<R, C, T>::operator=(const Matrix<R, C, T> &other)
 	{
 		auto otherData{other.getData()};
@@ -121,35 +128,35 @@ export namespace midnight
 		return *this;
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	Matrix<R, C, T> &Matrix<R, C, T>::operator+=(const Matrix<R, C, T> &other)
 	{
 		*this = *this + other;
 		return *this;
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	Matrix<R, C, T> &Matrix<R, C, T>::operator-=(const Matrix<R, C, T> &other)
 	{
 		*this = *this - other;
 		return *this;
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	Matrix<R, C, T> &Matrix<R, C, T>::operator*=(const Matrix<R, C, T> &other)
 	{
 		*this = *this * other;
 		return *this;
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	Matrix<R, C, T> &Matrix<R, C, T>::operator*=(const T other)
 	{
 		*this = *this * other;
 		return *this;
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	Matrix<R, C, T> Matrix<R, C, T>::operator+(const Matrix<R, C, T> &other) const
 	{
 		Matrix<R, C, T> mod{*this};
@@ -164,7 +171,7 @@ export namespace midnight
 		return mod;
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	Matrix<R, C, T> Matrix<R, C, T>::operator-(const Matrix<R, C, T> &other) const
 	{
 		Matrix<R, C, T> mod{*this};
@@ -179,22 +186,36 @@ export namespace midnight
 		return mod;
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	Matrix<R, C, T> Matrix<R, C, T>::operator-() const
 	{
-		Matrix<R, C, T> mod{*this * -1};
+		Matrix<R, C, T> mod{*this * -1.0f};
 		return mod;
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	template<unsigned long OR, unsigned long OC>
 	Matrix<R, OC, T> Matrix<R, C, T>::operator*(const Matrix<OR, OC, T> &other) const
 	{
+		assert(C == OR && MIDNIGHT_ERROR_DIMENSION_MISMATCH);
 		Matrix<R, OC, T> mod{0};
-		
+		auto otherData{other.getData()};
+		for(int i{0}; i < R; ++i)
+		{
+			for(int j{0}; j < OC; ++j)
+			{
+				float dotResult{0.0f};
+				for(int k{0}; k < C; ++k)
+				{
+					dotResult += data[j][k] * otherData[k][i];
+				}
+				mod.entry(j, i) = dotResult;
+			}
+		}
+		return mod;
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	Matrix<R, C, T> Matrix<R, C, T>::operator*(const T other) const
 	{
 		Matrix<R, C, T> mod{*this};
@@ -208,43 +229,61 @@ export namespace midnight
 		return mod;
 	}
 	
-	template<std::size_t R, std::size_t C, typename T>
-	T &Matrix<R, C, T>::entry(const std::size_t x, const std::size_t y)
+	template<std::size_t R, std::size_t C, class T>
+	T &Matrix<R, C, T>::entry(const std::size_t r, const std::size_t c)
 	{
-		assert(x < C && "Midnight, Matrix - x out of range");
-		assert(y < R && "Midnight, Matrix - y out of range");
-		return data[x][y];
+		assert(r < R && MIDNIGHT_ERROR_ROW_OUTRANGE);
+		assert(c < C && MIDNIGHT_ERROR_COLUMN_OUTRANGE);
+		return data[r][c];
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
-	const T &Matrix<R, C, T>::entry(const std::size_t x, const std::size_t y) const
+	template<std::size_t R, std::size_t C, class T>
+	const T &Matrix<R, C, T>::entry(const std::size_t r, const std::size_t c) const
 	{
-		assert(x < C && "Midnight, Matrix - x out of range");
-		assert(y < R && "Midnight, Matrix - y out of range");
-		return data[x][y];
+		assert(r < R && MIDNIGHT_ERROR_ROW_OUTRANGE);
+		assert(c < C && MIDNIGHT_ERROR_COLUMN_OUTRANGE);
+		return data[r][c];
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	auto &Matrix<R, C, T>::getData()
 	{
 		return data;
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	const auto &Matrix<R, C, T>::getData() const
 	{
 		return data;
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	std::size_t Matrix<R, C, T>::rows() const
 	{
 		return R;
 	}
 
-	template<std::size_t R, std::size_t C, typename T>
+	template<std::size_t R, std::size_t C, class T>
 	std::size_t Matrix<R, C, T>::columns() const
 	{
 		return C;
+	}
+
+	template<std::size_t R, std::size_t C, class T>
+	void Matrix<R, C, T>::write() const
+	{
+		std::cout << "{  ";
+		for(int i{0}; i < R; ++i)
+		{
+			for(int j{0}; j < C; ++j)
+			{
+				std::cout << data[i][j] << " ";
+			}
+			if(i < R - 1)
+			{
+				std::cout << "\n   ";
+			}
+		}
+		std::cout << " }\n" << std::flush;
 	}
 }
