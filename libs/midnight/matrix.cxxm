@@ -32,6 +32,8 @@ export namespace midnight
 	float length(const Matrix<R, 1, T> v);
 	template<std::size_t R, class T>
 	Matrix<R, 1, T> normalise(Matrix<R, 1, T> v);
+	template<class T>
+	Matrix<3, 1, T> cross(const Matrix<3, 1, T> v1, const Matrix<3, 1, T> v2);
 
 	template<std::size_t R, std::size_t C, class T>
 	struct Matrix final
@@ -98,6 +100,23 @@ export namespace midnight
 			v.entry(i, 0) /= l;
 		}
 		return v;
+	}
+
+	template<class T>
+	Matrix<3, 1, T> cross(const Matrix<3, 1, T> v1, const Matrix<3, 1, T> v2)
+	{
+		const T x1 = v1.entry(0, 0);
+		const T y1 = v1.entry(1, 0);
+		const T z1 = v1.entry(2, 0);
+		const T x2 = v2.entry(0, 0);
+		const T y2 = v2.entry(1, 0);
+		const T z2 = v2.entry(2, 0);
+		Matrix<3, 1, T> mod{{
+			y1 * z2 - y2 * z1,
+			z1 * x2 - z2 * x1,
+			x1 * y2 - x2 * y1
+		}};
+		return mod;
 	}
 }
 
