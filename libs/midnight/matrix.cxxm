@@ -10,7 +10,7 @@ module;
 
 #define MIDNIGHT_ERROR_ROW_OUTRANGE "Midnight, row out of range"
 #define MIDNIGHT_ERROR_COLUMN_OUTRANGE "Midnight, column out of range"
-#define MIDNIGHT_ERROR_DIMENSION_MISMATCH "Midnight, dimensions incompatible"
+#define MIDNIGHT_ERROR_DIMENSION_MISMATCH "Midnight, matrix dimensions incompatible"
 
 export module midnight:matrix;
 
@@ -61,6 +61,8 @@ export namespace midnight
 		std::size_t rows() const;
 		std::size_t columns() const;
 		void write() const;
+
+		Matrix<C, R, T> transpose() const;
 
 	private:
 		const std::size_t length{R * C};
@@ -307,5 +309,19 @@ export namespace midnight
 			}
 		}
 		std::cout << " }\n" << std::flush;
+	}
+
+	template<std::size_t R, std::size_t C, class T>
+	Matrix<C, R, T> Matrix<R, C, T>::transpose() const
+	{
+		Matrix<C, R, T> mod{0};
+		for(int i{0}; i < R; ++i)
+		{
+			for(int j{0}; j < C; ++j)
+			{
+				mod.entry(j, i) = data[i][j];
+			}
+		}
+		return mod;
 	}
 }
