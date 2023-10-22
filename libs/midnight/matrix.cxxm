@@ -35,6 +35,9 @@ export namespace midnight
 	template<class T>
 	Matrix<3, 1, T> cross(const Matrix<3, 1, T> v1, const Matrix<3, 1, T> v2);
 
+	template<class T>
+	Matrix<4, 4, T> rotation(const Matrix<3, 1, T> line, const float radians);
+
 	template<std::size_t R, std::size_t C, class T>
 	struct Matrix final
 	{
@@ -68,7 +71,7 @@ export namespace midnight
 
 	private:
 		const std::size_t length{R * C};
-		T data[R][C]{0};
+		T data[C][R]{0};
 	};
 }
 
@@ -94,7 +97,7 @@ export namespace midnight
 	template<std::size_t R, class T>
 	Matrix<R, 1, T> normalise(Matrix<R, 1, T> v)
 	{
-		float l = length(v);
+		float l{length(v)};
 		for(int i{0}; i < R; ++i)
 		{
 			v.entry(i, 0) /= l;
@@ -105,18 +108,19 @@ export namespace midnight
 	template<class T>
 	Matrix<3, 1, T> cross(const Matrix<3, 1, T> v1, const Matrix<3, 1, T> v2)
 	{
-		const T x1 = v1.entry(0, 0);
-		const T y1 = v1.entry(1, 0);
-		const T z1 = v1.entry(2, 0);
-		const T x2 = v2.entry(0, 0);
-		const T y2 = v2.entry(1, 0);
-		const T z2 = v2.entry(2, 0);
-		Matrix<3, 1, T> mod{{
+		const T x1{v1.entry(0, 0)};
+		const T y1{v1.entry(1, 0)};
+		const T z1{v1.entry(2, 0)};
+		const T x2{v2.entry(0, 0)};
+		const T y2{v2.entry(1, 0)};
+		const T z2{v2.entry(2, 0)};
+		return Matrix<3, 1, T>{{
 			y1 * z2 - y2 * z1,
 			z1 * x2 - z2 * x1,
 			x1 * y2 - x2 * y1
 		}};
-		return mod;
+	}
+
 	}
 }
 
@@ -134,7 +138,7 @@ export namespace midnight
 		unsigned long i{0}, j{0};
 		for(auto e{fill.begin()}; e != fill.end(); ++e)
 		{
-			data[i][j] = *e;
+			data[j][i] = *e;
 			++j;
 			if(j >= C)
 			{
@@ -152,7 +156,7 @@ export namespace midnight
 		{
 			for(int j{0}; j < C; ++j)
 			{
-				data[i][j] = otherData[i][j];
+				data[j][i] = otherData[j][i];
 			}
 		}
 	}
@@ -208,7 +212,7 @@ export namespace midnight
 		{
 			for(int j{0}; j < C; ++j)
 			{
-				mod.getData()[i][j] += otherData[i][j];	
+				mod.entry(i, j) += otherData[i][j];	
 			}
 		}
 		return mod;
@@ -223,7 +227,7 @@ export namespace midnight
 		{
 			for(int j{0}; j < C; ++j)
 			{
-				mod.getData()[i][j] -= otherData[i][j];	
+				mod.entry(i, j) -= otherData[i][j];	
 			}
 		}
 		return mod;
@@ -250,9 +254,9 @@ export namespace midnight
 				float dotResult{0.0f};
 				for(int k{0}; k < C; ++k)
 				{
-					dotResult += data[j][k] * otherData[k][i];
+					dotResult += data[k][j] * otherData[i][k];
 				}
-				mod.entry(j, i) = dotResult;
+				mod.entry(i, j) = dotResult;
 			}
 		}
 		return mod;
@@ -266,7 +270,7 @@ export namespace midnight
 		{
 			for(int j{0}; j < C; ++j)
 			{
-				mod.getData()[i][j] *= other;
+				mod.entry(i, j) *= other;
 			}
 		}
 		return mod;
@@ -277,7 +281,7 @@ export namespace midnight
 	{
 		assert(r < R && MIDNIGHT_ERROR_ROW_OUTRANGE);
 		assert(c < C && MIDNIGHT_ERROR_COLUMN_OUTRANGE);
-		return data[r][c];
+		return data[c][r];
 	}
 
 	template<std::size_t R, std::size_t C, class T>
@@ -285,7 +289,7 @@ export namespace midnight
 	{
 		assert(r < R && MIDNIGHT_ERROR_ROW_OUTRANGE);
 		assert(c < C && MIDNIGHT_ERROR_COLUMN_OUTRANGE);
-		return data[r][c];
+		return data[c][r];
 	}
 
 	template<std::size_t R, std::size_t C, class T>
@@ -320,7 +324,7 @@ export namespace midnight
 		{
 			for(int j{0}; j < C; ++j)
 			{
-				std::cout << data[i][j] << " ";
+				std::cout << entry(i, j) << " ";
 			}
 			if(i < R - 1)
 			{
