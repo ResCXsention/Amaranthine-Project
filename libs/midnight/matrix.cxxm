@@ -37,6 +37,8 @@ export namespace midnight
 
 	template<class T>
 	Matrix<4, 4, T> rotation(const Matrix<3, 1, T> line, const float radians);
+	template<std::size_t R, std::size_t C, class T>
+	bool operator==(const Matrix<R, C, T> &m1, const Matrix<R, C, T> &m2);
 
 	template<std::size_t R, std::size_t C, class T>
 	struct Matrix final
@@ -65,6 +67,13 @@ export namespace midnight
 		const auto &getData() const;
 		std::size_t rows() const;
 		std::size_t columns() const;
+		friend bool midnight::operator==(const Matrix<R, C, T> &m1, const Matrix<R, C, T> &m2);
+		inline T &entry(const std::size_t r, const std::size_t c);
+		inline const T &entry(const std::size_t r, const std::size_t c) const;
+		inline auto &getData();
+		inline const auto &getData() const;
+		inline std::size_t rows() const;
+		inline std::size_t columns() const;
 		void write() const;
 
 		Matrix<C, R, T> transpose() const;
@@ -304,9 +313,22 @@ export namespace midnight
 		}
 		return mod;
 	}
+	template<std::size_t R, std::size_t C, class T>
+	bool operator==(const Matrix<R, C, T> &m1, const Matrix<R, C, T> &m2)
+	{
+		for(std::size_t i{0}; i < R; ++i)
+		{
+			if(m1.entry(i / R, i % C) != m2.entry(i / R, i % C))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 	
 	template<std::size_t R, std::size_t C, class T>
 	T &Matrix<R, C, T>::entry(const std::size_t r, const std::size_t c)
+	inline T &Matrix<R, C, T>::entry(const std::size_t r, const std::size_t c)
 	{
 		assert(r < R && MIDNIGHT_ERROR_ROW_OUTRANGE);
 		assert(c < C && MIDNIGHT_ERROR_COLUMN_OUTRANGE);
@@ -315,6 +337,7 @@ export namespace midnight
 
 	template<std::size_t R, std::size_t C, class T>
 	const T &Matrix<R, C, T>::entry(const std::size_t r, const std::size_t c) const
+	inline const T &Matrix<R, C, T>::entry(const std::size_t r, const std::size_t c) const
 	{
 		assert(r < R && MIDNIGHT_ERROR_ROW_OUTRANGE);
 		assert(c < C && MIDNIGHT_ERROR_COLUMN_OUTRANGE);
@@ -329,18 +352,21 @@ export namespace midnight
 
 	template<std::size_t R, std::size_t C, class T>
 	const auto &Matrix<R, C, T>::getData() const
+	inline const auto &Matrix<R, C, T>::getData() const
 	{
 		return data;
 	}
 
 	template<std::size_t R, std::size_t C, class T>
 	std::size_t Matrix<R, C, T>::rows() const
+	inline std::size_t Matrix<R, C, T>::rows() const
 	{
 		return R;
 	}
 
 	template<std::size_t R, std::size_t C, class T>
 	std::size_t Matrix<R, C, T>::columns() const
+	inline std::size_t Matrix<R, C, T>::columns() const
 	{
 		return C;
 	}
