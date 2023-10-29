@@ -139,6 +139,7 @@ export namespace midnight
 		using std::cos;
 		using std::pow;
 		const float r{radians};
+		line = normalise(line);
 		const T xl{line.entry(0, 0)};
 		const T yl{line.entry(1, 0)};
 		const T zl{line.entry(2, 0)};
