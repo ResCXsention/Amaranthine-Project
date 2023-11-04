@@ -76,6 +76,7 @@ export namespace midnight
 
 		Matrix<C, R, T> transpose() const;
 		Matrix<R - 1, C - 1, T> minor(const std::size_t r, const std::size_t c) const;
+		Matrix<R - 1, C - 1, T> cofactor(const std::size_t r, const std::size_t c) const;
 
 	private:
 		const std::size_t length{R * C};
@@ -419,7 +420,7 @@ export namespace midnight
 		{
 			for(int j{0}; j < C; ++j)
 			{
-				mod.entry(j, i) = entry(j, i);
+				mod.entry(j, i) = entry(i, j);
 			}
 		}
 		return mod;
@@ -449,4 +450,14 @@ export namespace midnight
 		}
 		return mod;
 	}
+
+	template<std::size_t R, std::size_t C, class T>
+	Matrix<R - 1, C - 1, T> Matrix<R, C, T>::cofactor(const std::size_t r, const std::size_t c) const
+	{
+		assert(R >= 3 && MIDNIGHT_ERROR_DIMENSION_MISMATCH);
+		assert(C >= 3 && MIDNIGHT_ERROR_DIMENSION_MISMATCH);
+		assert(R == C && MIDNIGHT_ERROR_NONSQUARE);
+		return minor(r, c) * std::pow(-1, r + c);
+	}
+
 }
