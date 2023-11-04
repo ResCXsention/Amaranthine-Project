@@ -10,7 +10,8 @@ module;
 
 #define MIDNIGHT_ERROR_ROW_OUTRANGE "Midnight, row out of range"
 #define MIDNIGHT_ERROR_COLUMN_OUTRANGE "Midnight, column out of range"
-#define MIDNIGHT_ERROR_DIMENSION_MISMATCH "Midnight, matrix dimensions incompatible"
+#define MIDNIGHT_ERROR_DIMENSION_MISMATCH "Midnight, matrix dimensions unworkable"
+#define MIDNIGHT_ERROR_NONSQUARE "Midnight, this matrix isn't a square"
 
 export module midnight:matrix;
 
@@ -74,6 +75,7 @@ export namespace midnight
 		void write() const;
 
 		Matrix<C, R, T> transpose() const;
+		Matrix<R - 1, C - 1, T> minor(const std::size_t r, const std::size_t c) const;
 
 	private:
 		const std::size_t length{R * C};
@@ -418,6 +420,28 @@ export namespace midnight
 			for(int j{0}; j < C; ++j)
 			{
 				mod.entry(j, i) = data[i][j];
+	template<std::size_t R, std::size_t C, class T>
+	Matrix<R - 1, C - 1, T> Matrix<R, C, T>::minor(const std::size_t r, const std::size_t c) const
+	{
+		static_assert(R >= 3, "MIDNIGHT_ERROR_DIMENSION_MISMATCH");
+		static_assert(C >= 3, "MIDNIGHT_ERROR_DIMENSION_MISMATCH");
+		static_assert(R == C && "MIDNIGHT_ERROR_NONSQUARE");
+		assert(r < R && MIDNIGHT_ERROR_ROW_OUTRANGE);
+		assert(c < C && MIDNIGHT_ERROR_COLUMN_OUTRANGE);
+		Matrix<R - 1, C - 1, T> mod{0};
+		for(std::size_t i{0}; i < R; ++i)
+		{
+			if(i == r)
+			{
+				continue;
+			}
+			for(std::size_t j{0}; j < C; ++j)
+			{
+				if(j == c)
+				{
+					continue;
+				}
+				mod.entry(i > r ? i - 1 : i, j > c ? j - 1 : j) = entry(i, j); 
 			}
 		}
 		return mod;
