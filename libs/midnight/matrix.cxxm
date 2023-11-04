@@ -428,7 +428,7 @@ export namespace midnight
 	{
 		static_assert(R >= 3, "MIDNIGHT_ERROR_DIMENSION_MISMATCH");
 		static_assert(C >= 3, "MIDNIGHT_ERROR_DIMENSION_MISMATCH");
-		static_assert(R == C && "MIDNIGHT_ERROR_NONSQUARE");
+		static_assert(R == C, "MIDNIGHT_ERROR_NONSQUARE");
 		assert(r < R && MIDNIGHT_ERROR_ROW_OUTRANGE);
 		assert(c < C && MIDNIGHT_ERROR_COLUMN_OUTRANGE);
 		Matrix<R - 1, C - 1, T> mod{0};
