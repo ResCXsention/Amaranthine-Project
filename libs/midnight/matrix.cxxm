@@ -217,9 +217,9 @@ export namespace midnight
 	Matrix<R, C, T>::Matrix(const Matrix<R, C, T> &other)
 	{
 		auto otherData{other.getData()};
-		for(int i{0}; i < R; ++i)
+		for(std::size_t i{0}; i < R; ++i)
 		{
-			for(int j{0}; j < C; ++j)
+			for(std::size_t j{0}; j < C; ++j)
 			{
 				data[j][i] = otherData[j][i];
 			}
@@ -230,9 +230,9 @@ export namespace midnight
 	Matrix<R, C, T> &Matrix<R, C, T>::operator=(const Matrix<R, C, T> &other)
 	{
 		auto otherData{other.getData()};
-		for(int i{0}; i < R; ++i)
+		for(std::size_t i{0}; i < R; ++i)
 		{
-			for(int j{0}; j < C; ++j)
+			for(std::size_t j{0}; j < C; ++j)
 			{
 				data[i][j] = otherData[i][j];
 			}
@@ -273,9 +273,9 @@ export namespace midnight
 	{
 		Matrix<R, C, T> mod{*this};
 		auto otherData{other.getData()};
-		for(int i{0}; i < R; ++i)
+		for(std::size_t i{0}; i < R; ++i)
 		{
-			for(int j{0}; j < C; ++j)
+			for(std::size_t j{0}; j < C; ++j)
 			{
 				mod.entry(i, j) += otherData[i][j];	
 			}
@@ -288,9 +288,9 @@ export namespace midnight
 	{
 		Matrix<R, C, T> mod{*this};
 		auto otherData{other.getData()};
-		for(int i{0}; i < R; ++i)
+		for(std::size_t i{0}; i < R; ++i)
 		{
-			for(int j{0}; j < C; ++j)
+			for(std::size_t j{0}; j < C; ++j)
 			{
 				mod.entry(i, j) -= otherData[i][j];	
 			}
@@ -311,12 +311,12 @@ export namespace midnight
 	{
 		assert(C == OR && MIDNIGHT_ERROR_DIMENSION_MISMATCH);
 		Matrix<R, OC, T> mod{0};
-		for(int i{0}; i < R; ++i)
+		for(std::size_t i{0}; i < R; ++i)
 		{
-			for(int j{0}; j < OC; ++j)
+			for(std::size_t j{0}; j < OC; ++j)
 			{
 				float dotResult{0.0f};
-				for(int k{0}; k < C; ++k)
+				for(std::size_t k{0}; k < C; ++k)
 				{
 					dotResult += entry(i, k) * other.entry(k, j);
 				}
@@ -330,9 +330,9 @@ export namespace midnight
 	Matrix<R, C, T> Matrix<R, C, T>::operator*(const T other) const
 	{
 		Matrix<R, C, T> mod{*this};
-		for(int i{0}; i < R; ++i)
+		for(std::size_t i{0}; i < R; ++i)
 		{
-			for(int j{0}; j < C; ++j)
+			for(std::size_t j{0}; j < C; ++j)
 			{
 				mod.entry(i, j) *= other;
 			}
@@ -419,7 +419,10 @@ export namespace midnight
 		{
 			for(int j{0}; j < C; ++j)
 			{
-				mod.entry(j, i) = data[i][j];
+				mod.entry(j, i) = entry(j, i);
+			}
+		}
+		return mod;
 	template<std::size_t R, std::size_t C, class T>
 	Matrix<R - 1, C - 1, T> Matrix<R, C, T>::minor(const std::size_t r, const std::size_t c) const
 	{
