@@ -77,6 +77,7 @@ export namespace midnight
 		Matrix<C, R, T> transpose() const;
 		Matrix<R - 1, C - 1, T> minor(const std::size_t r, const std::size_t c) const;
 		Matrix<R - 1, C - 1, T> cofactor(const std::size_t r, const std::size_t c) const;
+		float determinant() const;
 
 	private:
 		const std::size_t length{R * C};
@@ -201,7 +202,7 @@ export namespace midnight
 	template<std::size_t R, std::size_t C, class T>
 	Matrix<R, C, T>::Matrix(const std::initializer_list<T> fill)
 	{
-		unsigned long i{0}, j{0};
+		std::size_t i{0}, j{0};
 		for(auto e{fill.begin()}; e != fill.end(); ++e)
 		{
 			data[j][i] = *e;
@@ -424,6 +425,8 @@ export namespace midnight
 			}
 		}
 		return mod;
+	}
+
 	template<std::size_t R, std::size_t C, class T>
 	Matrix<R - 1, C - 1, T> Matrix<R, C, T>::minor(const std::size_t r, const std::size_t c) const
 	{
@@ -452,12 +455,29 @@ export namespace midnight
 	}
 
 	template<std::size_t R, std::size_t C, class T>
-	Matrix<R - 1, C - 1, T> Matrix<R, C, T>::cofactor(const std::size_t r, const std::size_t c) const
+	float Matrix<R, C, T>::determinant() const
 	{
-		assert(R >= 3 && MIDNIGHT_ERROR_DIMENSION_MISMATCH);
-		assert(C >= 3 && MIDNIGHT_ERROR_DIMENSION_MISMATCH);
 		assert(R == C && MIDNIGHT_ERROR_NONSQUARE);
-		return minor(r, c) * std::pow(-1, r + c);
+		auto compute = [] (const Matrix<2, 2, float> m) -> float
+		{
+			const float m00{m.entry(0, 0)};
+			const float m11{m.entry(1, 1)};
+			const float m01{m.entry(0, 1)};
+			const float m10{m.entry(1, 0)};
+			return (m00 * m11) - (m01 * m10);
+		};
+		if constexpr(R == 2)
+		{
+			return compute(*this);
+		}
+		else
+		{
+			float mod{0.0f};
+			for(std::size_t j{0}; j < C; ++j)
+			{
+				mod += this->entry(0, j) * std::pow(-1, j) * (this->minor(0, j).determinant());
+			}
+			return mod;
+		}
 	}
-
 }
