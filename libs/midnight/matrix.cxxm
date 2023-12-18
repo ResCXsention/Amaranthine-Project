@@ -8,12 +8,14 @@ module;
 #include <initializer_list>
 #include <iostream>
 
-#define MIDNIGHT_ERROR_ROW_OUTRANGE "Midnight, row out of range"
-#define MIDNIGHT_ERROR_COLUMN_OUTRANGE "Midnight, column out of range"
-#define MIDNIGHT_ERROR_DIMENSION_MISMATCH "Midnight, matrix dimensions unworkable"
-#define MIDNIGHT_ERROR_NONSQUARE "Midnight, this matrix isn't a square"
-
 export module midnight:matrix;
+
+static const char* MIDNIGHT_ERROR_ROW_OUTRANGE = "Midnight, row out of range";
+static const char* MIDNIGHT_ERROR_COLUMN_OUTRANGE = "Midnight, column out of range";
+static const char* MIDNIGHT_ERROR_DIMENSION_MISMATCH = "Midnight, matrix dimensions unworkable";
+static const char* MIDNIGHT_ERROR_NONSQUARE = "Midnight, this matrix isn't a square";
+static const char* MIDNIGHT_ERROR_ZERO = "Midnight, determinant is zero";
+static const char* MIDNIGHT_WRONG_SIZE = "Midnight, matrix construct initaliser list of wrong length";
 
 export namespace midnight
 {
@@ -78,6 +80,7 @@ export namespace midnight
 		Matrix<R - 1, C - 1, T> minor(const std::size_t r, const std::size_t c) const;
 		Matrix<R - 1, C - 1, T> cofactor(const std::size_t r, const std::size_t c) const;
 		float determinant() const;
+		Matrix<R, C, T> inverse() const;
 
 	private:
 		const std::size_t length{R * C};
@@ -196,13 +199,20 @@ export namespace midnight
 	template<std::size_t R, std::size_t C, class T>
 	Matrix<R, C, T>::Matrix(const T fill)
 	{
-		data = {fill};
+		for(std::size_t i{0}; i < R; ++i)
+		{
+			for(std::size_t j{0}; j < C; ++j)
+			{
+				data[j][i] = fill;
+			}
+		}
 	}
 
 	template<std::size_t R, std::size_t C, class T>
 	Matrix<R, C, T>::Matrix(const std::initializer_list<T> fill)
 	{
 		std::size_t i{0}, j{0};
+		assert(fill.size() == R * C && MIDNIGHT_WRONG_SIZE);
 		for(auto e{fill.begin()}; e != fill.end(); ++e)
 		{
 			data[j][i] = *e;
@@ -312,7 +322,7 @@ export namespace midnight
 	Matrix<R, OC, T> Matrix<R, C, T>::operator*(const Matrix<OR, OC, T> &other) const
 	{
 		assert(C == OR && MIDNIGHT_ERROR_DIMENSION_MISMATCH);
-		Matrix<R, OC, T> mod{0};
+		Matrix<R, OC, T> mod(0);
 		for(std::size_t i{0}; i < R; ++i)
 		{
 			for(std::size_t j{0}; j < OC; ++j)
@@ -416,7 +426,7 @@ export namespace midnight
 	template<std::size_t R, std::size_t C, class T>
 	Matrix<C, R, T> Matrix<R, C, T>::transpose() const
 	{
-		Matrix<C, R, T> mod{0};
+		Matrix<C, R, T> mod(0);
 		for(int i{0}; i < R; ++i)
 		{
 			for(int j{0}; j < C; ++j)
@@ -430,12 +440,12 @@ export namespace midnight
 	template<std::size_t R, std::size_t C, class T>
 	Matrix<R - 1, C - 1, T> Matrix<R, C, T>::minor(const std::size_t r, const std::size_t c) const
 	{
-		static_assert(R >= 3, "MIDNIGHT_ERROR_DIMENSION_MISMATCH");
-		static_assert(C >= 3, "MIDNIGHT_ERROR_DIMENSION_MISMATCH");
-		static_assert(R == C, "MIDNIGHT_ERROR_NONSQUARE");
+		assert(R >= 3 && MIDNIGHT_ERROR_DIMENSION_MISMATCH);
+		assert(C >= 3 && MIDNIGHT_ERROR_DIMENSION_MISMATCH);
+		assert(R == C && MIDNIGHT_ERROR_NONSQUARE);
 		assert(r < R && MIDNIGHT_ERROR_ROW_OUTRANGE);
 		assert(c < C && MIDNIGHT_ERROR_COLUMN_OUTRANGE);
-		Matrix<R - 1, C - 1, T> mod{0};
+		Matrix<R - 1, C - 1, T> mod(0);
 		for(std::size_t i{0}; i < R; ++i)
 		{
 			if(i == r)
@@ -458,7 +468,7 @@ export namespace midnight
 	float Matrix<R, C, T>::determinant() const
 	{
 		assert(R == C && MIDNIGHT_ERROR_NONSQUARE);
-		auto compute = [] (const Matrix<2, 2, float> m) -> float
+		static auto compute = [](const Matrix<2, 2, float> m) -> float
 		{
 			const float m00{m.entry(0, 0)};
 			const float m11{m.entry(1, 1)};
@@ -479,5 +489,20 @@ export namespace midnight
 			}
 			return mod;
 		}
+	}
+
+	template<std::size_t R, std::size_t C, class T>
+	Matrix<R, C ,T> Matrix<R, C, T>::inverse() const
+	{
+		assert(this->determinant() != 0 && MIDNIGHT_ERROR_ZERO);
+		Matrix<R, C, T> mod(0);
+		for(std::size_t i{0}; i < R; ++i)
+		{
+			for(std::size_t j{0}; j < R; ++j)
+			{
+				mod.entry(i, j) = std::pow(-1, i + j) * (this->minor(i, j).determinant());
+			}
+		}
+		return mod.transpose() * (1 / this->determinant());
 	}
 }
