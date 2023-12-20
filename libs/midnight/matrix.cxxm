@@ -42,6 +42,8 @@ export namespace midnight
 	Matrix<4, 4, T> rotation(const Matrix<3, 1, T> line, const float radians);
 	template<class T>
 	Matrix<4, 4, T> scale(const Matrix<3, 1, T> line, const float factor);
+	template<class T>
+	Matrix<4, 4, T> translation(const Matrix<3, 1, T> line);
 
 	template<std::size_t R, std::size_t C, class T>
 	bool operator==(const Matrix<R, C, T> &m1, const Matrix<R, C, T> &m2);
@@ -191,6 +193,17 @@ export namespace midnight
 
 			0, 0, 0, 1
 		}};
+	}
+
+	template<class T>
+	Matrix<4, 4, T> translation(const Matrix<3, 1, T> line)
+	{
+		return Matrix<4, 4, T>{
+			1, 0, 0, line.entry(0, 0),
+			0, 1, 0, line.entry(1, 0),
+			0, 0, 1, line.entry(2, 0),
+			0, 0, 0, 1
+		};
 	}
 }
 
