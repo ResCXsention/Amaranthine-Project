@@ -34,7 +34,7 @@ export namespace midnight
 	template<std::size_t R, class T>
 	float length(const Matrix<R, 1, T> v);
 	template<std::size_t R, class T>
-	Matrix<R, 1, T> normalise(Matrix<R, 1, T> v);
+	Matrix<R, 1, T> normalise(const Matrix<R, 1, T> v);
 	template<class T>
 	Matrix<3, 1, T> cross(const Matrix<3, 1, T> v1, const Matrix<3, 1, T> v2);
 
@@ -110,14 +110,15 @@ export namespace midnight
 	}
 
 	template<std::size_t R, class T>
-	Matrix<R, 1, T> normalise(Matrix<R, 1, T> v)
+	Matrix<R, 1, T> normalise(const Matrix<R, 1, T> v)
 	{
-		float l{length(v)};
+		Matrix<R, 1, T> mod(0);
+		const float l{length(v)};
 		for(int i{0}; i < R; ++i)
 		{
-			v.entry(i, 0) /= l;
+			mod.entry(i, 0) /= l;
 		}
-		return v;
+		return mod;
 	}
 
 	template<class T>
@@ -137,17 +138,17 @@ export namespace midnight
 	}
 
 	template<class T>
-	Matrix<4, 4, T> rotation(Matrix<3, 1, T> line, const float radians)
+	Matrix<4, 4, T> rotation(const Matrix<3, 1, T> line, const float radians)
 	{
 		using std::sin;
 		using std::cos;
 		using std::pow;
 		const float r{radians};
-		line = normalise(line);
-		const T xl{line.entry(0, 0)};
-		const T yl{line.entry(1, 0)};
-		const T zl{line.entry(2, 0)};
-		return Matrix<4, 4, T>{{
+		const Matrix<3, 1, T> l(normalise(line));
+		const T xl{l.entry(0, 0)};
+		const T yl{l.entry(1, 0)};
+		const T zl{l.entry(2, 0)};
+		return Matrix<4, 4, T>{
 			(static_cast<T>(pow(xl, 2)) * (1 - cos(r))) + cos(r),
 			(xl * yl) * (1 - cos(r)) + (zl * sin(r)),
 			(xl * zl) * (1 - cos(r)) - (yl * sin(r)),
@@ -164,19 +165,19 @@ export namespace midnight
 			0,
 
 			0, 0, 0, 1
-		}};
+		};
 	}
 
 	template<class T>
-	Matrix<4, 4, T> scale(Matrix<3, 1, T> line, const float factor)
+	Matrix<4, 4, T> scale(const Matrix<3, 1, T> line, const float factor)
 	{
 		using std::pow;
-		line = normalise(line);
-		const T xl{line.entry(0, 0)};
-		const T yl{line.entry(1, 0)};
-		const T zl{line.entry(2, 0)};
+		const Matrix<3, 1, T> l(normalise(line));
+		const T xl{l.entry(0, 0)};
+		const T yl{l.entry(1, 0)};
+		const T zl{l.entry(2, 0)};
 		const float f{factor};
-		return Matrix<4, 4, T>{{
+		return Matrix<4, 4, T>{
 			static_cast<float>(pow(xl, 2)) * (f - 1) + 1,
 			xl * yl * (f - 1),
 			xl * zl * (f - 1),
@@ -192,7 +193,7 @@ export namespace midnight
 			static_cast<float>(pow(zl, 2)) * (f - 1) + 1,
 
 			0, 0, 0, 1
-		}};
+		};
 	}
 
 	template<class T>
