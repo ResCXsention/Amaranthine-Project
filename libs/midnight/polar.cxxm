@@ -1,0 +1,13 @@
+module;
+
+export module midnight:polar;
+
+export namespace midnight
+{
+	struct Polar final
+	{
+
+	};
+}
+
+

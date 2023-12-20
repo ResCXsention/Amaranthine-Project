@@ -3,7 +3,6 @@ module;
 #include <cmath>
 #include <cassert>
 #include <cstddef>
-#include <cmath>
 #include <array>
 #include <initializer_list>
 #include <iostream>
