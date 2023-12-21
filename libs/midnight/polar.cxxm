@@ -1,13 +1,75 @@
 module;
 
+#include <cmath>
+#include <numbers>
+#include <iostream>
+
 export module midnight:polar;
 
 export namespace midnight
 {
 	struct Polar final
 	{
+	public :
+		Polar() = default;
+		Polar(const float radius, const float azimuth, const float zenith);
 
+		float getRadius() const;
+		float getAzimuth() const;
+		float getZenith() const;
+		void canonise();
+		void write() const;
+	
+	private :
+		float radius{0.0f};
+		float azimuth{0.0f};
+		float zenith{0.0f};
 	};
+}
+
+namespace midnight
+{
+	Polar::Polar(const float radius, const float azimuth, const float zenith)
+	: radius{radius}, azimuth{azimuth}, zenith{zenith}
+	{
+		canonise();
+	}
+
+	float Polar::getRadius() const
+	{
+		return radius;
+	}
+
+	float Polar::getAzimuth() const
+	{
+		return azimuth;
+	}
+
+	float Polar::getZenith() const
+	{
+		return zenith;
+	}
+
+	void Polar::write() const
+	{
+		std::cout << "( " << radius << " " << azimuth << " " << zenith << " )" << std::endl;
+	}
+
+	void Polar::canonise()
+	{
+		if(radius == 0.0f)
+		{
+			zenith = 0.0f;
+			azimuth = 0.0f;
+			return;
+		}
+		if(radius < 0.0f)
+		{
+			radius = -radius;
+			azimuth += std::numbers::pi;
+			zenith += std::numbers::pi;
+		}
+	}
 }
 
 
