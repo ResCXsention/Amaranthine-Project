@@ -1,11 +1,15 @@
 module;
 
 #include <numbers>
+#include <cstddef>
 
 export module midnight:utils;
 
 export namespace midnight
 {
+	template<std::size_t R, std::size_t C>
+	struct Matrix;
+	
 	float radians(const float degrees);
 	float degrees(const float radians);
 }

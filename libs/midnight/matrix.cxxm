@@ -18,81 +18,77 @@ static const char* MIDNIGHT_WRONG_SIZE = "Midnight, matrix construct initaliser 
 
 export namespace midnight
 {
-	template<std::size_t R, std::size_t C, class T>
+	template<std::size_t R, std::size_t C>
 	struct Matrix;
 
-	typedef Matrix<2, 1, float> Vector2;
-	typedef Matrix<3, 1, float> Vector3;
-	typedef Matrix<4, 1, float> Vector4;
-	typedef Matrix<2, 2, float> Matrix2x2;
-	typedef Matrix<3, 3, float> Matrix3x3;
-	typedef Matrix<4, 4, float> Matrix4x4;
+	typedef Matrix<2, 1> Vector2;
+	typedef Matrix<3, 1> Vector3;
+	typedef Matrix<4, 1> Vector4;
+	typedef Matrix<2, 2> Matrix2x2;
+	typedef Matrix<3, 3> Matrix3x3;
+	typedef Matrix<4, 4> Matrix4x4;
 
-	template<std::size_t R, class T>
-	float dot(const Matrix<R, 1, T> v1, const Matrix<R, 1, T> v2);
-	template<std::size_t R, class T>
-	float length(const Matrix<R, 1, T> v);
-	template<std::size_t R, class T>
-	Matrix<R, 1, T> normalise(const Matrix<R, 1, T> v);
-	template<class T>
-	Matrix<3, 1, T> cross(const Matrix<3, 1, T> v1, const Matrix<3, 1, T> v2);
+	template<std::size_t R>
+	float dot(const Matrix<R, 1> v1, const Matrix<R, 1> v2);
+	template<std::size_t R>
+	float length(const Matrix<R, 1> v);
+	template<std::size_t R>
+	Matrix<R, 1> normalise(const Matrix<R, 1> v);
+	Matrix<3, 1> cross(const Matrix<3, 1> v1, const Matrix<3, 1> v2);
 
-	template<class T>
-	Matrix<4, 4, T> rotation(const Matrix<3, 1, T> line, const float radians);
-	template<class T>
-	Matrix<4, 4, T> scale(const Matrix<3, 1, T> line, const float factor);
-	template<class T>
-	Matrix<4, 4, T> translation(const Matrix<3, 1, T> line);
+	Matrix<4, 4> rotation(const Matrix<3, 1> line, const float radians);
+	Matrix<4, 4> scale(const Matrix<3, 1> line, const float factor);
+	Matrix<4, 4> translation(const Matrix<3, 1> line);
 
-	template<std::size_t R, std::size_t C, class T>
-	bool operator==(const Matrix<R, C, T> &m1, const Matrix<R, C, T> &m2);
+	template<std::size_t R, std::size_t C>
+	bool operator==(const Matrix<R, C> &m1, const Matrix<R, C> &m2);
 
-	template<std::size_t R, std::size_t C, class T>
+	template<std::size_t R, std::size_t C>
 	struct Matrix final
 	{
 	public:
 		Matrix() = default;
-		Matrix(const T fill);
-		Matrix(const std::initializer_list<T> fill);
-		Matrix(const Matrix<R, C, T> &other);
+		Matrix(const float fill);
+		Matrix(const std::initializer_list<float> fill);
+		Matrix(const Matrix<R, C> &other);
 		
-		Matrix<R, C, T> &operator=(const Matrix<R, C, T> &other);
-		Matrix<R, C, T> &operator+=(const Matrix<R, C, T> &other);
-		Matrix<R, C, T> &operator-=(const Matrix<R, C, T> &other);
-		Matrix<R, C, T> &operator*=(const Matrix<R, C, T> &other);
-		Matrix<R, C, T> &operator*=(const T other);
-		Matrix<R, C, T> operator+(const Matrix<R, C, T> &other) const;
-		Matrix<R, C, T> operator-(const Matrix<R, C, T> &other) const;
-		Matrix<R, C, T> operator-() const;
+		Matrix<R, C> &operator=(const Matrix<R, C> &other);
+		Matrix<R, C> &operator+=(const Matrix<R, C> &other);
+		Matrix<R, C> &operator-=(const Matrix<R, C> &other);
+		Matrix<R, C> &operator*=(const Matrix<R, C> &other);
+		Matrix<R, C> &operator*=(const float other);
+		Matrix<R, C> operator+(const Matrix<R, C> &other) const;
+		Matrix<R, C> operator-(const Matrix<R, C> &other) const;
+		Matrix<R, C> operator-() const;
 		template<unsigned long OR, unsigned long OC>
-		Matrix<R, OC, T> operator*(const Matrix<OR, OC, T> &other) const;
-		Matrix<R, C, T> operator*(const T other) const;
-		friend bool midnight::operator==(const Matrix<R, C, T> &m1, const Matrix<R, C, T> &m2);
+		Matrix<R, OC> operator*(const Matrix<OR, OC> &other) const;
+		Matrix<R, C> operator*(const float other) const;
+		friend bool midnight::operator==(const Matrix<R, C> &m1, const Matrix<R, C> &m2);
 
-		inline T &entry(const std::size_t r, const std::size_t c);
-		inline const T &entry(const std::size_t r, const std::size_t c) const;
+		inline float &entry(const std::size_t r, const std::size_t c);
+		inline const float &entry(const std::size_t r, const std::size_t c) const;
 		inline auto &getData();
 		inline const auto &getData() const;
 		inline std::size_t rows() const;
 		inline std::size_t columns() const;
 		void write() const;
 
-		Matrix<C, R, T> transpose() const;
-		Matrix<R - 1, C - 1, T> minor(const std::size_t r, const std::size_t c) const;
-		Matrix<R - 1, C - 1, T> cofactor(const std::size_t r, const std::size_t c) const;
+		Matrix<C, R> transpose() const;
+		Matrix<R - 1, C - 1> minor(const std::size_t r, const std::size_t c) const;
+		Matrix<R - 1, C - 1> cofactor(const std::size_t r, const std::size_t c) const;
 		float determinant() const;
-		Matrix<R, C, T> inverse() const;
+		Matrix<R, C> inverse() const;
 
 	private:
 		const std::size_t length{R * C};
-		T data[C][R]{0};
+		float data[C][R]{0};
 	};
 }
 
 export namespace midnight
 {
-	template<std::size_t R, class T>
-	float dot(const Matrix<R, 1, T> v1, const Matrix<R, 1, T> v2)
+	template<std::size_t R>
+	float dot(const Matrix<R, 1> v1, const Matrix<R, 1> v2)
 	{
 		float mod{0.0f};
 		for(int i{0}; i < R; ++i)
@@ -102,16 +98,16 @@ export namespace midnight
 		return mod;
 	}
 
-	template<std::size_t R, class T>
-	float length(const Matrix<R, 1, T> v)
+	template<std::size_t R>
+	float length(const Matrix<R, 1> v)
 	{
 		return std::sqrt(dot(v, v));
 	}
 
-	template<std::size_t R, class T>
-	Matrix<R, 1, T> normalise(const Matrix<R, 1, T> v)
+	template<std::size_t R>
+	Matrix<R, 1> normalise(const Matrix<R, 1> v)
 	{
-		Matrix<R, 1, T> mod(0);
+		Matrix<R, 1> mod(0);
 		const float l{length(v)};
 		for(int i{0}; i < R; ++i)
 		{
@@ -120,63 +116,60 @@ export namespace midnight
 		return mod;
 	}
 
-	template<class T>
-	Matrix<3, 1, T> cross(const Matrix<3, 1, T> v1, const Matrix<3, 1, T> v2)
+	Matrix<3, 1> cross(const Matrix<3, 1> v1, const Matrix<3, 1> v2)
 	{
-		const T x1{v1.entry(0, 0)};
-		const T y1{v1.entry(1, 0)};
-		const T z1{v1.entry(2, 0)};
-		const T x2{v2.entry(0, 0)};
-		const T y2{v2.entry(1, 0)};
-		const T z2{v2.entry(2, 0)};
-		return Matrix<3, 1, T>{{
+		const float x1{v1.entry(0, 0)};
+		const float y1{v1.entry(1, 0)};
+		const float z1{v1.entry(2, 0)};
+		const float x2{v2.entry(0, 0)};
+		const float y2{v2.entry(1, 0)};
+		const float z2{v2.entry(2, 0)};
+		return Matrix<3, 1>{{
 			y1 * z2 - y2 * z1,
 			z1 * x2 - z2 * x1,
 			x1 * y2 - x2 * y1
 		}};
 	}
 
-	template<class T>
-	Matrix<4, 4, T> rotation(const Matrix<3, 1, T> line, const float radians)
+	Matrix<4, 4> rotation(const Matrix<3, 1> line, const float radians)
 	{
 		using std::sin;
 		using std::cos;
 		using std::pow;
 		const float r{radians};
-		const Matrix<3, 1, T> l(normalise(line));
-		const T xl{l.entry(0, 0)};
-		const T yl{l.entry(1, 0)};
-		const T zl{l.entry(2, 0)};
-		return Matrix<4, 4, T>{
-			(static_cast<T>(pow(xl, 2)) * (1 - cos(r))) + cos(r),
+		const Matrix<3, 1> l(normalise(line));
+		const float xl{l.entry(0, 0)};
+		const float yl{l.entry(1, 0)};
+		const float zl{l.entry(2, 0)};
+		return Matrix<4, 4>{
+			(static_cast<float>(pow(xl, 2)) * (1 - cos(r))) + cos(r),
 			(xl * yl) * (1 - cos(r)) + (zl * sin(r)),
 			(xl * zl) * (1 - cos(r)) - (yl * sin(r)),
 			0,
 
 			(xl * yl) * (1 - cos(r)) - (zl * sin(r)),
-			(static_cast<T>(pow(yl, 2)) * (1 - cos(r))) + cos(r),
+			(static_cast<float>(pow(yl, 2)) * (1 - cos(r))) + cos(r),
 			(yl * zl) * (1 - cos(r)) + (xl * sin(r)),
 			0,
 
 			(xl * zl) * (1 - cos(r)) + (yl * sin(r)),
 			(yl * zl) * (1 - cos(r)) - (xl * sin(r)),
-			(static_cast<T>(pow(zl, 2)) * (1 - cos(r))) + cos(r),
+			(static_cast<float>(pow(zl, 2)) * (1 - cos(r))) + cos(r),
 			0,
 
 			0, 0, 0, 1
 		};
 	}
 
-	template<class T>
-	Matrix<4, 4, T> scale(const Matrix<3, 1, T> line, const float factor)
+	Matrix<4, 4> scale(const Matrix<3, 1> line, const float factor)
 	{
 		using std::pow;
-		const Matrix<3, 1, T> l(normalise(line));
-		const T xl{l.entry(0, 0)};
-		const T yl{l.entry(1, 0)};
-		const T zl{l.entry(2, 0)};
+		const Matrix<3, 1> l(normalise(line));
+		const float xl{l.entry(0, 0)};
+		const float yl{l.entry(1, 0)};
+		const float zl{l.entry(2, 0)};
 		const float f{factor};
-		return Matrix<4, 4, T>{
+		return Matrix<4, 4>{
 			static_cast<float>(pow(xl, 2)) * (f - 1) + 1,
 			xl * yl * (f - 1),
 			xl * zl * (f - 1),
@@ -195,10 +188,9 @@ export namespace midnight
 		};
 	}
 
-	template<class T>
-	Matrix<4, 4, T> translation(const Matrix<3, 1, T> line)
+	Matrix<4, 4> translation(const Matrix<3, 1> line)
 	{
-		return Matrix<4, 4, T>{
+		return Matrix<4, 4>{
 			1, 0, 0, line.entry(0, 0),
 			0, 1, 0, line.entry(1, 0),
 			0, 0, 1, line.entry(2, 0),
@@ -209,8 +201,8 @@ export namespace midnight
 
 export namespace midnight
 {
-	template<std::size_t R, std::size_t C, class T>
-	Matrix<R, C, T>::Matrix(const T fill)
+	template<std::size_t R, std::size_t C>
+	Matrix<R, C>::Matrix(const float fill)
 	{
 		for(std::size_t i{0}; i < R; ++i)
 		{
@@ -221,8 +213,8 @@ export namespace midnight
 		}
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	Matrix<R, C, T>::Matrix(const std::initializer_list<T> fill)
+	template<std::size_t R, std::size_t C>
+	Matrix<R, C>::Matrix(const std::initializer_list<float> fill)
 	{
 		std::size_t i{0}, j{0};
 		assert(fill.size() == R * C && MIDNIGHT_WRONG_SIZE);
@@ -238,8 +230,8 @@ export namespace midnight
 		}
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	Matrix<R, C, T>::Matrix(const Matrix<R, C, T> &other)
+	template<std::size_t R, std::size_t C>
+	Matrix<R, C>::Matrix(const Matrix<R, C> &other)
 	{
 		auto otherData{other.getData()};
 		for(std::size_t i{0}; i < R; ++i)
@@ -251,8 +243,8 @@ export namespace midnight
 		}
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	Matrix<R, C, T> &Matrix<R, C, T>::operator=(const Matrix<R, C, T> &other)
+	template<std::size_t R, std::size_t C>
+	Matrix<R, C> &Matrix<R, C>::operator=(const Matrix<R, C> &other)
 	{
 		auto otherData{other.getData()};
 		for(std::size_t i{0}; i < R; ++i)
@@ -265,38 +257,38 @@ export namespace midnight
 		return *this;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	Matrix<R, C, T> &Matrix<R, C, T>::operator+=(const Matrix<R, C, T> &other)
+	template<std::size_t R, std::size_t C>
+	Matrix<R, C> &Matrix<R, C>::operator+=(const Matrix<R, C> &other)
 	{
 		*this = *this + other;
 		return *this;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	Matrix<R, C, T> &Matrix<R, C, T>::operator-=(const Matrix<R, C, T> &other)
+	template<std::size_t R, std::size_t C>
+	Matrix<R, C> &Matrix<R, C>::operator-=(const Matrix<R, C> &other)
 	{
 		*this = *this - other;
 		return *this;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	Matrix<R, C, T> &Matrix<R, C, T>::operator*=(const Matrix<R, C, T> &other)
+	template<std::size_t R, std::size_t C>
+	Matrix<R, C> &Matrix<R, C>::operator*=(const Matrix<R, C> &other)
 	{
 		*this = *this * other;
 		return *this;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	Matrix<R, C, T> &Matrix<R, C, T>::operator*=(const T other)
+	template<std::size_t R, std::size_t C>
+	Matrix<R, C> &Matrix<R, C>::operator*=(const float other)
 	{
 		*this = *this * other;
 		return *this;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	Matrix<R, C, T> Matrix<R, C, T>::operator+(const Matrix<R, C, T> &other) const
+	template<std::size_t R, std::size_t C>
+	Matrix<R, C> Matrix<R, C>::operator+(const Matrix<R, C> &other) const
 	{
-		Matrix<R, C, T> mod{*this};
+		Matrix<R, C> mod{*this};
 		auto otherData{other.getData()};
 		for(std::size_t i{0}; i < R; ++i)
 		{
@@ -308,10 +300,10 @@ export namespace midnight
 		return mod;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	Matrix<R, C, T> Matrix<R, C, T>::operator-(const Matrix<R, C, T> &other) const
+	template<std::size_t R, std::size_t C>
+	Matrix<R, C> Matrix<R, C>::operator-(const Matrix<R, C> &other) const
 	{
-		Matrix<R, C, T> mod{*this};
+		Matrix<R, C> mod{*this};
 		auto otherData{other.getData()};
 		for(std::size_t i{0}; i < R; ++i)
 		{
@@ -323,19 +315,19 @@ export namespace midnight
 		return mod;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	Matrix<R, C, T> Matrix<R, C, T>::operator-() const
+	template<std::size_t R, std::size_t C>
+	Matrix<R, C> Matrix<R, C>::operator-() const
 	{
-		Matrix<R, C, T> mod{*this * -1.0f};
+		Matrix<R, C> mod{*this * -1.0f};
 		return mod;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
+	template<std::size_t R, std::size_t C>
 	template<unsigned long OR, unsigned long OC>
-	Matrix<R, OC, T> Matrix<R, C, T>::operator*(const Matrix<OR, OC, T> &other) const
+	Matrix<R, OC> Matrix<R, C>::operator*(const Matrix<OR, OC> &other) const
 	{
 		assert(C == OR && MIDNIGHT_ERROR_DIMENSION_MISMATCH);
-		Matrix<R, OC, T> mod(0);
+		Matrix<R, OC> mod(0);
 		for(std::size_t i{0}; i < R; ++i)
 		{
 			for(std::size_t j{0}; j < OC; ++j)
@@ -351,10 +343,10 @@ export namespace midnight
 		return mod;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	Matrix<R, C, T> Matrix<R, C, T>::operator*(const T other) const
+	template<std::size_t R, std::size_t C>
+	Matrix<R, C> Matrix<R, C>::operator*(const float other) const
 	{
-		Matrix<R, C, T> mod{*this};
+		Matrix<R, C> mod{*this};
 		for(std::size_t i{0}; i < R; ++i)
 		{
 			for(std::size_t j{0}; j < C; ++j)
@@ -365,8 +357,8 @@ export namespace midnight
 		return mod;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	bool operator==(const Matrix<R, C, T> &m1, const Matrix<R, C, T> &m2)
+	template<std::size_t R, std::size_t C>
+	bool operator==(const Matrix<R, C> &m1, const Matrix<R, C> &m2)
 	{
 		for(std::size_t i{0}; i < R; ++i)
 		{
@@ -378,48 +370,48 @@ export namespace midnight
 		return true;
 	}
 	
-	template<std::size_t R, std::size_t C, class T>
-	inline T &Matrix<R, C, T>::entry(const std::size_t r, const std::size_t c)
+	template<std::size_t R, std::size_t C>
+	inline float &Matrix<R, C>::entry(const std::size_t r, const std::size_t c)
 	{
 		assert(r < R && MIDNIGHT_ERROR_ROW_OUTRANGE);
 		assert(c < C && MIDNIGHT_ERROR_COLUMN_OUTRANGE);
 		return data[c][r];
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	inline const T &Matrix<R, C, T>::entry(const std::size_t r, const std::size_t c) const
+	template<std::size_t R, std::size_t C>
+	inline const float &Matrix<R, C>::entry(const std::size_t r, const std::size_t c) const
 	{
 		assert(r < R && MIDNIGHT_ERROR_ROW_OUTRANGE);
 		assert(c < C && MIDNIGHT_ERROR_COLUMN_OUTRANGE);
 		return data[c][r];
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	auto &Matrix<R, C, T>::getData()
+	template<std::size_t R, std::size_t C>
+	auto &Matrix<R, C>::getData()
 	{
 		return data;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	inline const auto &Matrix<R, C, T>::getData() const
+	template<std::size_t R, std::size_t C>
+	inline const auto &Matrix<R, C>::getData() const
 	{
 		return data;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	inline std::size_t Matrix<R, C, T>::rows() const
+	template<std::size_t R, std::size_t C>
+	inline std::size_t Matrix<R, C>::rows() const
 	{
 		return R;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	inline std::size_t Matrix<R, C, T>::columns() const
+	template<std::size_t R, std::size_t C>
+	inline std::size_t Matrix<R, C>::columns() const
 	{
 		return C;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	void Matrix<R, C, T>::write() const
+	template<std::size_t R, std::size_t C>
+	void Matrix<R, C>::write() const
 	{
 		std::cout << "{  ";
 		for(int i{0}; i < R; ++i)
@@ -436,10 +428,10 @@ export namespace midnight
 		std::cout << " }\n" << std::flush;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	Matrix<C, R, T> Matrix<R, C, T>::transpose() const
+	template<std::size_t R, std::size_t C>
+	Matrix<C, R> Matrix<R, C>::transpose() const
 	{
-		Matrix<C, R, T> mod(0);
+		Matrix<C, R> mod(0);
 		for(int i{0}; i < R; ++i)
 		{
 			for(int j{0}; j < C; ++j)
@@ -450,15 +442,15 @@ export namespace midnight
 		return mod;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	Matrix<R - 1, C - 1, T> Matrix<R, C, T>::minor(const std::size_t r, const std::size_t c) const
+	template<std::size_t R, std::size_t C>
+	Matrix<R - 1, C - 1> Matrix<R, C>::minor(const std::size_t r, const std::size_t c) const
 	{
 		assert(R >= 3 && MIDNIGHT_ERROR_DIMENSION_MISMATCH);
 		assert(C >= 3 && MIDNIGHT_ERROR_DIMENSION_MISMATCH);
 		assert(R == C && MIDNIGHT_ERROR_NONSQUARE);
 		assert(r < R && MIDNIGHT_ERROR_ROW_OUTRANGE);
 		assert(c < C && MIDNIGHT_ERROR_COLUMN_OUTRANGE);
-		Matrix<R - 1, C - 1, T> mod(0);
+		Matrix<R - 1, C - 1> mod(0);
 		for(std::size_t i{0}; i < R; ++i)
 		{
 			if(i == r)
@@ -477,11 +469,11 @@ export namespace midnight
 		return mod;
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	float Matrix<R, C, T>::determinant() const
+	template<std::size_t R, std::size_t C>
+	float Matrix<R, C>::determinant() const
 	{
 		assert(R == C && MIDNIGHT_ERROR_NONSQUARE);
-		static auto compute = [](const Matrix<2, 2, float> m) -> float
+		static auto compute = [](const Matrix<2, 2> m) -> float
 		{
 			const float m00{m.entry(0, 0)};
 			const float m11{m.entry(1, 1)};
@@ -504,11 +496,11 @@ export namespace midnight
 		}
 	}
 
-	template<std::size_t R, std::size_t C, class T>
-	Matrix<R, C ,T> Matrix<R, C, T>::inverse() const
+	template<std::size_t R, std::size_t C>
+	Matrix<R, C> Matrix<R, C>::inverse() const
 	{
 		assert(this->determinant() != 0 && MIDNIGHT_ERROR_ZERO);
-		Matrix<R, C, T> mod(0);
+		Matrix<R, C> mod(0);
 		for(std::size_t i{0}; i < R; ++i)
 		{
 			for(std::size_t j{0}; j < R; ++j)
