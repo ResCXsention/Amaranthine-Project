@@ -70,6 +70,25 @@ namespace midnight
 			azimuth += std::numbers::pi;
 			zenith += std::numbers::pi;
 		}
+		if(zenith < 0 || zenith > std::numbers::pi)
+		{
+			zenith -= 2 * std::numbers::pi * std::floor(zenith / (2 * std::numbers::pi));
+			if(zenith > std::numbers::pi)
+			{
+				azimuth += std::numbers::pi;
+				zenith = std::numbers::pi - (zenith - std::numbers::pi);
+			}
+		}
+		if(zenith < 0.0001)
+		{
+			azimuth = 0.0f;
+		}
+		else
+		{
+			azimuth += (std::numbers::pi);
+			azimuth -= 2 * std::numbers::pi * std::floor(azimuth / (2 * std::numbers::pi));
+			azimuth -= std::numbers::pi;
+		}
 	}
 }
 
