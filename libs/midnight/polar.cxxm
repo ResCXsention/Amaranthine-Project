@@ -5,6 +5,7 @@ module;
 #include <iostream>
 
 export module midnight:polar;
+import :utils;
 
 export namespace midnight
 {
@@ -12,40 +13,40 @@ export namespace midnight
 	{
 	public :
 		Polar() = default;
-		Polar(const float radius, const float azimuth, const float zenith);
+		Polar(const double radius, const double azimuth, const double zenith);
 
-		float getRadius() const;
-		float getAzimuth() const;
-		float getZenith() const;
+		inline double getRadius() const;
+		inline double getAzimuth() const;
+		inline double getZenith() const;
 		void canonise();
 		void write() const;
 	
 	private :
-		float radius{0.0f};
-		float azimuth{0.0f};
-		float zenith{0.0f};
+		double radius{0.0f};
+		double azimuth{0.0f};
+		double zenith{0.0f};
 	};
 }
 
 namespace midnight
 {
-	Polar::Polar(const float radius, const float azimuth, const float zenith)
+	Polar::Polar(const double radius, const double azimuth, const double zenith)
 	: radius{radius}, azimuth{azimuth}, zenith{zenith}
 	{
 		canonise();
 	}
 
-	float Polar::getRadius() const
+	inline double Polar::getRadius() const
 	{
 		return radius;
 	}
 
-	float Polar::getAzimuth() const
+	inline double Polar::getAzimuth() const
 	{
 		return azimuth;
 	}
 
-	float Polar::getZenith() const
+	inline double Polar::getZenith() const
 	{
 		return zenith;
 	}
