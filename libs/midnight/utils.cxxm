@@ -13,7 +13,7 @@ export namespace midnight
 	double degrees(const double radians);
 
 	Matrix<4, 1> cartesian(const Polar coordinate);
-	Polar spherical(const Matrix<3, 1> coordinate);
+	Polar spherical(const Matrix<4, 1> coordinate);
 }
 
 export namespace midnight
@@ -28,9 +28,9 @@ export namespace midnight
 		return radians * (std::numbers::inv_pi * 180.0f);
 	}
 
-	Matrix<3, 1> cartesian(const Polar coordinate)
+	Matrix<4, 1> cartesian(const Polar coordinate)
 	{
-		Matrix<3, 1> mod(0);
+		Matrix<4, 1> mod(1);
 		using std::cos, std::sin;
 		const double radius{coordinate.getRadius()};
 		const double heading{coordinate.getHeading()};
@@ -41,7 +41,7 @@ export namespace midnight
 		return mod;
 	}
 
-	Polar spherical(const Matrix<3, 1> coordinate)
+	Polar spherical(const Matrix<4, 1> coordinate)
 	{
 		Polar mod;
 		mod.setRadius(std::sqrt(dot(coordinate, coordinate)));

@@ -36,6 +36,8 @@ export namespace midnight
 	Matrix<R, 1> normalise(const Matrix<R, 1> v);
 	Matrix<3, 1> cross(const Matrix<3, 1> v1, const Matrix<3, 1> v2);
 
+	template<std::size_t D>
+	Matrix<D, D> identity();
 	Matrix<4, 4> rotation(const Matrix<3, 1> line, const double radians);
 	Matrix<4, 4> scale(const Matrix<3, 1> line, const double factor);
 	Matrix<4, 4> translation(const Matrix<3, 1> line);
@@ -129,6 +131,17 @@ export namespace midnight
 			z1 * x2 - z2 * x1,
 			x1 * y2 - x2 * y1
 		}};
+	}
+
+	template<std::size_t D>
+	Matrix<D, D> identity()
+	{
+		Matrix<D, D> mod(0);
+		for(std::size_t i{0}; i < D; ++i)
+		{
+			mod.entry(i, i) = 1;
+		}
+		return mod;
 	}
 
 	Matrix<4, 4> rotation(const Matrix<3, 1> line, const double radians)
