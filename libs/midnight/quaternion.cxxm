@@ -1,0 +1,156 @@
+module;
+
+#include <cmath>
+#include <iostream>
+
+export module midnight:quaternion;
+import :matrix;
+
+export namespace midnight
+{
+	struct Quaternion;
+
+	Quaternion identity();
+	double dot(const Quaternion q1, const Quaternion q2);
+	Quaternion exponentiate(const Quaternion q, const double p);
+
+	struct Quaternion final
+	{
+	public :
+		Quaternion() = default;
+		Quaternion(const double angle, const double x, const double y, const double z);
+		Quaternion(const double angle, const Matrix<3, 1> n);
+
+		Quaternion operator*=(const Quaternion other);
+		Quaternion operator-() const;
+		Quaternion operator*(const Quaternion other) const;
+		Quaternion operator*(const double other) const;
+
+		double getW() const;
+		double getX() const;
+		double getY() const;
+		double getZ() const;
+		double length() const;
+		Quaternion conjugate() const;
+		Quaternion inverse() const;
+		void write() const;
+
+	private :
+		double w{0.0};
+		double x{0.0};
+		double y{0.0};
+		double z{0.0};
+
+		friend double dot(const Quaternion q1, const Quaternion q2);
+		friend Quaternion exponentiate(const Quaternion q, const double exponent);
+	};
+}
+
+export namespace midnight
+{
+	Quaternion identity()
+	{
+		return Quaternion{1, 0, 0, 0};
+	}
+
+	double dot(const Quaternion q1, const Quaternion q2)
+	{
+		return q1.w * q2.w + dot(Matrix<3, 1>{q1.x, q2.y, q1.z}, Matrix<3, 1>{q2.x, q2.y, q2.z});
+	}
+
+	Quaternion exponentiate(const Quaternion q, const double exponent)
+	{
+		Quaternion mod{q};
+		if(std::fabs(q.w) < 0.9999)
+		{
+			const double halfAngle{std::acos(mod.w)};
+			const double newHalfAngle{halfAngle * exponent};
+			const double t{std::sin(newHalfAngle) / std::sin(halfAngle)};
+			mod.w = newHalfAngle;
+			mod.x *= t;
+			mod.y *= t;
+			mod.z *= t;
+		}
+		return mod;
+	}
+}
+
+export namespace midnight
+{
+	Quaternion::Quaternion(const double angle, const double x, const double y, const double z)
+	: w{std::cos(angle / 2)}, x{std::sin(angle / 2) * x}, y{std::sin(angle / 2) * y}, z{std::sin(angle / 2) * z}
+	{
+	}
+
+	Quaternion::Quaternion(const double angle, const Matrix<3, 1> n)
+	: Quaternion(angle, n.entry(0, 0), n.entry(1, 0), n.entry(2, 0))
+	{
+	}
+
+	Quaternion Quaternion::operator*=(const Quaternion other)
+	{
+		*this = *this * other;
+		return *this;
+	}
+
+	Quaternion Quaternion::operator-() const
+	{
+		return Quaternion{-w, -x, -y, -z};
+	}
+
+	Quaternion Quaternion::operator*(const Quaternion other) const
+	{
+		Quaternion mod;
+		mod.w = w * other.w - x * other.x - y * other.y - z * other.z;
+
+		mod.x = w * other.x + x * other.w + y * other.z - z * other.y;
+		mod.y = w * other.y + y * other.w + z * other.x - x * other.z;
+		mod.z = w * other.z + z * other.w + x * other.y - y * other.x;
+		return mod;
+	}
+
+	Quaternion Quaternion::operator*(const double other) const
+	{
+		return Quaternion{w * other, x * other, y * other, z * other};
+	}
+
+	double Quaternion::getW() const
+	{
+		return w;
+	}
+
+	double Quaternion::getX() const
+	{
+		return x;
+	}
+
+	double Quaternion::getY() const
+	{
+		return y;
+	}
+
+	double Quaternion::getZ() const
+	{
+		return z;
+	}
+
+	double Quaternion::length() const
+	{
+		return std::sqrt(w * w + x * x + y * y + z * z);
+	}
+
+	Quaternion Quaternion::conjugate() const
+	{
+		return Quaternion{w, -x, -y, -z};
+	}
+
+	Quaternion Quaternion::inverse() const
+	{
+		return Quaternion{w, -x, -y, -z} * (1 / length());
+	}
+
+	void Quaternion::write() const
+	{
+		std::cout << "[ " << w << " ( " << x << " " << y << " " << z <<  " ) ]" << std::endl;
+	}
+}
