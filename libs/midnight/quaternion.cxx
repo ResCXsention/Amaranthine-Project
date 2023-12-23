@@ -11,8 +11,8 @@ export namespace midnight
 {
 	struct Quaternion;
 
-	Quaternion identity();
 	double dot(const Quaternion q1, const Quaternion q2);
+	Quaternion quaternionIdentity();
 	Quaternion quaternionExponentiate(const Quaternion q, const double p);
 	Quaternion quaternionAngleBetween(const Matrix<3, 1> v1, const Matrix<3, 1> v2);
 	Quaternion quaternionRotation(const double angle, const Matrix<3, 1> axis);
@@ -55,14 +55,14 @@ export namespace midnight
 
 export namespace midnight
 {
-	Quaternion identity()
-	{
-		return Quaternion{1, 0, 0, 0};
-	}
-
 	double dot(const Quaternion q1, const Quaternion q2)
 	{
 		return q1.w * q2.w + dot(Matrix<3, 1>{q1.x, q2.y, q1.z}, Matrix<3, 1>{q2.x, q2.y, q2.z});
+	}
+
+	Quaternion quaternionIdentity()
+	{
+		return Quaternion{1, 0, 0, 0};
 	}
 
 	Quaternion quaternionExponentiate(const Quaternion q, const double exponent)
@@ -83,19 +83,18 @@ export namespace midnight
 
 	Quaternion quaternionAngleBetween(const Matrix<3, 1> v1, const Matrix<3, 1> v2)
 	{
+		Quaternion mod{1, 0, 0, 0};
 		const Matrix<3, 1> n1(normalise(v1));
 		const Matrix<3, 1> n2(normalise(v2));
 		if(dot(n1, n2) == 1)
 		{
-			return Quaternion{1, 0, 0, 0};
+			return mod;
 		}
 		else if(dot(n1, n2) == -1)
 		{
-			Quaternion mod{1, 0, 0, 0};
 			mod = quaternionRotation(std::numbers::pi, cross(n1, Matrix<3, 1>{1, 0, 0})) * mod;
 			return mod;
 		}
-		Quaternion mod;
 		mod.w = 1 + (dot(n1, n2));
 		const Matrix<3, 1> c(cross(n1, n2));
 		mod.x = c.entry(0, 0);

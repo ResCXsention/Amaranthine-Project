@@ -37,7 +37,7 @@ export namespace midnight
 	Matrix<3, 1> cross(const Matrix<3, 1> v1, const Matrix<3, 1> v2);
 
 	template<std::size_t D>
-	Matrix<D, D> identity();
+	Matrix<D, D> matrixIdentity();
 	Matrix<4, 4> matrixRotation(const Matrix<3, 1> line, const double radians);
 	Matrix<4, 4> matrixScale(const Matrix<3, 1> line, const double factor);
 	Matrix<4, 4> matrixTranslation(const Matrix<3, 1> line);
@@ -128,8 +128,9 @@ export namespace midnight
 		}};
 	}
 
+	
 	template<std::size_t D>
-	Matrix<D, D> identity()
+	Matrix<D, D> matrixIdentity()
 	{
 		Matrix<D, D> mod(0);
 		for(std::size_t i{0}; i < D; ++i)
@@ -139,7 +140,7 @@ export namespace midnight
 		return mod;
 	}
 
-	Matrix<4, 4> matrixRotation(const Matrix<3, 1> line, const double radians)
+	Matrix<4, 4> rotation(const Matrix<3, 1> line, const double radians)
 	{
 		using std::sin, std::cos, std::pow;
 		const double r{radians};
@@ -167,7 +168,7 @@ export namespace midnight
 		};
 	}
 
-	Matrix<4, 4> matrixScale(const Matrix<3, 1> line, const double factor)
+	Matrix<4, 4> scale(const Matrix<3, 1> line, const double factor)
 	{
 		using std::pow;
 		const Matrix<3, 1> l(normalise(line));
@@ -194,7 +195,7 @@ export namespace midnight
 		};
 	}
 
-	Matrix<4, 4> matrixTranslation(const Matrix<3, 1> line)
+	Matrix<4, 4> translation(const Matrix<3, 1> line)
 	{
 		return Matrix<4, 4>{
 			1, 0, 0, line.entry(0, 0),
