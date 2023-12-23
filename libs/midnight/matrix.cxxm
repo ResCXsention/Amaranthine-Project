@@ -92,8 +92,8 @@ export namespace midnight
 	template<std::size_t R>
 	double dot(const Matrix<R, 1> v1, const Matrix<R, 1> v2)
 	{
-		double mod{0.0f};
-		for(int i{0}; i < R; ++i)
+		double mod{0.0};
+		for(std::size_t i{0}; i < R; ++i)
 		{
 			mod += v1.entry(i, 0) * v2.entry(i, 0);
 		}
@@ -109,13 +109,8 @@ export namespace midnight
 	template<std::size_t R>
 	Matrix<R, 1> normalise(const Matrix<R, 1> v)
 	{
-		Matrix<R, 1> mod(0);
 		const double l{length(v)};
-		for(int i{0}; i < R; ++i)
-		{
-			mod.entry(i, 0) /= l;
-		}
-		return mod;
+		return v * (1 / l);
 	}
 
 	Matrix<3, 1> cross(const Matrix<3, 1> v1, const Matrix<3, 1> v2)
