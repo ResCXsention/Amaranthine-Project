@@ -1,6 +1,7 @@
 module;
 
 #include <cmath>
+#include <numbers>
 #include <iostream>
 
 export module midnight:quaternion;
@@ -12,11 +13,14 @@ export namespace midnight
 
 	Quaternion identity();
 	double dot(const Quaternion q1, const Quaternion q2);
-	Quaternion exponentiate(const Quaternion q, const double p);
+	Quaternion quaternionExponentiate(const Quaternion q, const double p);
+	Quaternion quaternionAngleBetween(const Matrix<3, 1> v1, const Matrix<3, 1> v2);
+	Quaternion quaternionRotation(const double angle, const Matrix<3, 1> axis);
+	Matrix<3, 1> quaternionRotateVector(const Matrix<3, 1> v, const Quaternion q);
 
 	struct Quaternion final
 	{
-	public :
+	public:
 		Quaternion() = default;
 		Quaternion(const double angle, const double x, const double y, const double z);
 		Quaternion(const double angle, const Matrix<3, 1> n);
@@ -35,14 +39,17 @@ export namespace midnight
 		Quaternion inverse() const;
 		void write() const;
 
-	private :
+	private:
 		double w{0.0};
 		double x{0.0};
 		double y{0.0};
 		double z{0.0};
 
 		friend double dot(const Quaternion q1, const Quaternion q2);
-		friend Quaternion exponentiate(const Quaternion q, const double exponent);
+		friend Quaternion quaternionExponentiate(const Quaternion q, const double exponent);
+		friend Quaternion quaternionAngleBetween(const Matrix<3, 1> v1, const Matrix<3, 1> v2);
+		friend Quaternion quaternionRotation(const double angle, const Matrix<3, 1> axis);
+		friend Matrix<3, 1> quaternionRotateVector(const Matrix<3, 1> v, const Quaternion q);
 	};
 }
 
@@ -58,7 +65,7 @@ export namespace midnight
 		return q1.w * q2.w + dot(Matrix<3, 1>{q1.x, q2.y, q1.z}, Matrix<3, 1>{q2.x, q2.y, q2.z});
 	}
 
-	Quaternion exponentiate(const Quaternion q, const double exponent)
+	Quaternion quaternionExponentiate(const Quaternion q, const double exponent)
 	{
 		Quaternion mod{q};
 		if(std::fabs(q.w) < 0.9999)
@@ -72,6 +79,48 @@ export namespace midnight
 			mod.z *= t;
 		}
 		return mod;
+	}
+
+	Quaternion quaternionAngleBetween(const Matrix<3, 1> v1, const Matrix<3, 1> v2)
+	{
+		const Matrix<3, 1> n1(normalise(v1));
+		const Matrix<3, 1> n2(normalise(v2));
+		if(dot(n1, n2) == 1)
+		{
+			return Quaternion{1, 0, 0, 0};
+		}
+		else if(dot(n1, n2) == -1)
+		{
+			Quaternion mod{1, 0, 0, 0};
+			mod = quaternionRotation(std::numbers::pi, cross(n1, Matrix<3, 1>{1, 0, 0})) * mod;
+			return mod;
+		}
+		Quaternion mod;
+		mod.w = 1 + (dot(n1, n2));
+		const Matrix<3, 1> c(cross(n1, n2));
+		mod.x = c.entry(0, 0);
+		mod.y = c.entry(1, 0);
+		mod.z = c.entry(2, 0);
+		return mod * (1 / mod.length());
+	}
+
+	Quaternion quaternionRotation(const double angle, const Matrix<3, 1> axis)
+	{
+		Quaternion mod;
+		const Matrix<3, 1> n(normalise(axis));
+		using std::cos, std::sin;
+		mod.w = cos(angle / 2);
+		mod.x = sin(angle / 2) * n.entry(0, 0);
+		mod.y = sin(angle / 2) * n.entry(1, 0);
+		mod.z = sin(angle / 2) * n.entry(2, 0);
+		return mod;
+	}
+
+	Matrix<3, 1> quaternionRotateVector(const Matrix<3, 1> v, const Quaternion q)
+	{
+		const Quaternion mod{q * Quaternion{0, v.entry(0, 0), v.entry(1, 0), v.entry(2, 0)} * q.inverse()};
+		mod.write();
+		return Matrix<3, 1>{mod.x, mod.y, mod.z};
 	}
 }
 
