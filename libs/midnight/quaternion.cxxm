@@ -78,7 +78,7 @@ export namespace midnight
 export namespace midnight
 {
 	Quaternion::Quaternion(const double angle, const double x, const double y, const double z)
-	: w{std::cos(angle / 2)}, x{std::sin(angle / 2) * x}, y{std::sin(angle / 2) * y}, z{std::sin(angle / 2) * z}
+	: w{angle}, x{x}, y{y}, z{z}
 	{
 	}
 
@@ -146,7 +146,15 @@ export namespace midnight
 
 	Quaternion Quaternion::inverse() const
 	{
-		return Quaternion{w, -x, -y, -z} * (1 / length());
+		const double l{length()};
+		if(l == 1)
+		{
+			return Quaternion{w, -x, -y, -z};
+		}
+		else
+		{
+			return Quaternion{w, -x, -y, -z} * (1 / (l * l));
+		}
 	}
 
 	void Quaternion::write() const
