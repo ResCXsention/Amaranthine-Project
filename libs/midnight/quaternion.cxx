@@ -57,7 +57,7 @@ export namespace midnight
 {
 	double dot(const Quaternion q1, const Quaternion q2)
 	{
-		return q1.w * q2.w + dot(Matrix<3, 1>{q1.x, q2.y, q1.z}, Matrix<3, 1>{q2.x, q2.y, q2.z});
+		return q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q2.z * q2.z;
 	}
 
 	Quaternion quaternionIdentity()
