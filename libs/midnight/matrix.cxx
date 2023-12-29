@@ -38,7 +38,7 @@ export namespace midnight
 
 	template<std::size_t D>
 	Matrix<D, D> matrixIdentity();
-	Matrix<4, 4> matrixRotation(const Matrix<3, 1> line, const double radians);
+	Matrix<4, 4> matrixRotation(const Matrix<3, 1> line, const double angle);
 	Matrix<4, 4> matrixScale(const Matrix<3, 1> line, const double factor);
 	Matrix<4, 4> matrixTranslation(const Matrix<3, 1> line);
 
@@ -140,10 +140,10 @@ export namespace midnight
 		return mod;
 	}
 
-	Matrix<4, 4> rotation(const Matrix<3, 1> line, const double radians)
+	Matrix<4, 4> matrixRotation(const Matrix<3, 1> line, const double angle)
 	{
 		using std::sin, std::cos, std::pow;
-		const double r{radians};
+		const double r{angle};
 		const Matrix<3, 1> l(normalise(line));
 		const double xl{l.entry(0, 0)};
 		const double yl{l.entry(1, 0)};
@@ -168,7 +168,7 @@ export namespace midnight
 		};
 	}
 
-	Matrix<4, 4> scale(const Matrix<3, 1> line, const double factor)
+	Matrix<4, 4> matrixScale(const Matrix<3, 1> line, const double factor)
 	{
 		using std::pow;
 		const Matrix<3, 1> l(normalise(line));
@@ -195,7 +195,7 @@ export namespace midnight
 		};
 	}
 
-	Matrix<4, 4> translation(const Matrix<3, 1> line)
+	Matrix<4, 4> matrixTranslation(const Matrix<3, 1> line)
 	{
 		return Matrix<4, 4>{
 			1, 0, 0, line.entry(0, 0),
@@ -258,7 +258,7 @@ export namespace midnight
 		{
 			for(std::size_t j{0}; j < C; ++j)
 			{
-				data[i][j] = otherData[i][j];
+				data[j][i] = otherData[j][i];
 			}
 		}
 		return *this;
