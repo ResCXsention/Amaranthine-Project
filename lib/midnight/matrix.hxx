@@ -39,6 +39,8 @@ namespace midnight
 	Matrix<4, 4> matrixRotation(const Matrix<3, 1> line, const double angle);
 	Matrix<4, 4> matrixScale(const Matrix<3, 1> line, const double factor);
 	Matrix<4, 4> matrixTranslation(const Matrix<3, 1> line);
+	Matrix<4, 4> matrixPerspective(const double fov, const double aspect, const double near, const double far);
+	Matrix<4, 4> matrixOrthographic(const double width, const double height, const double near, const double far);
 
 	template<std::size_t R, std::size_t C>
 	bool operator==(const Matrix<R, C> &m1, const Matrix<R, C> &m2);

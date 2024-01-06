@@ -81,4 +81,26 @@ namespace midnight
 			0, 0, 0, 1
 		};
 	}
+
+	Matrix<4, 4> matrixPerspective(const double fovx, const double aspect, const double near, const double far)
+	{
+		const double zoomx{1 / (std::tan(fovx / 2))};
+		const double zoomy{aspect * zoomx};
+		return Matrix<4, 4>{
+			zoomx, 0, 0, 0,
+			0, zoomy, 0, 0,
+			0, 0, -(far + near) / (far - near), -(2 * near * far) / (far - near),
+			0, 0, -1, 0
+		};
+	}
+
+	Matrix<4, 4> matrixOrthographic(const double width, const double height, const double near, const double far)
+	{
+		return Matrix<4, 4>{
+			2 / width, 0, 0, 0,
+			0, 2 / height, 0, 0,
+			0, 0, -2 / (far - near), -(far + near) / (far - near),
+			0, 0, 0, 1
+		};
+	}
 }
