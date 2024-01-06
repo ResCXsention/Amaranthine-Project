@@ -6,11 +6,13 @@
 #include <glbinding/glbinding.h>
 #include <GLFW/glfw3.h>
 
+#include <midnight/matrix.hxx>
+
 namespace glfwcbs
 {
 	void framebufferSizeCallback(GLFWwindow *win, int w, int h)
 	{
-		gl::glViewport(0, 0, default_win_w, default_win_h);
+		gl::glViewport(0, 0, w, h);
 	}
 }
 
