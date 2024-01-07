@@ -1,4 +1,6 @@
 #include <cstddef>
+#include <fstream>
+#include <string>
 #include <iostream>
 
 #define GLFW_INCLUDE_NONE
@@ -7,10 +9,11 @@
 #include <GLFW/glfw3.h>
 
 #include <midnight/matrix.hxx>
+#include <midnight/util.hxx>
 
 namespace glfwcbs
 {
-	void framebufferSizeCallback(GLFWwindow *win, int w, int h)
+	void framebufferSizeCb(GLFWwindow *win, int w, int h)
 	{
 		gl::glViewport(0, 0, w, h);
 	}
@@ -25,7 +28,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	GLFWwindow *mw{glfwCreateWindow(default_win_w, default_win_h, "The Amaranthine Project", NULL, NULL)};
-	glfwSetFramebufferSizeCallback(mw, glfwcbs::framebufferSizeCallback);
+	glfwSetFramebufferSizeCallback(mw, glfwcbs::framebufferSizeCb);
 	glfwMakeContextCurrent(mw);
 	glbinding::initialize(glfwGetProcAddress);
 	gl::glViewport(0, 0, default_win_w, default_win_h);

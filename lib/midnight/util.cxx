@@ -1,6 +1,7 @@
 #include "util.hxx"
 
 #include <numbers>
+#include <fstream>
 #include <cmath>
 
 namespace midnight
@@ -13,6 +14,19 @@ namespace midnight
 	inline double degrees(const double angle)
 	{
 		return angle * (std::numbers::inv_pi * 180);
+	}
+
+	std::string readFile(const char *filename)
+	{
+		std::ifstream fs{filename, std::ios::binary | std::ios::ate};
+		if (!fs.is_open()) {
+			std::cout << "fail" << std::endl;
+		}
+		const auto size{fs.tellg()};
+		fs.seekg(0);
+		std::string text(size, '\0');
+		fs.read(&text[0], size);
+		return text;
 	}
 
 	Matrix<3, 1> cartesian3(const Polar coordinate)
