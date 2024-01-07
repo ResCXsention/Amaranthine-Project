@@ -6,9 +6,9 @@ namespace midnight
 	struct Polar final
 	{
 	public:
-		double radius{0};
-		double heading{0};
-		double pitch{0};
+		float radius{0};
+		float heading{0};
+		float pitch{0};
 
 		void canonise();
 		void write() const;

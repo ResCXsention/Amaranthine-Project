@@ -7,12 +7,12 @@
 
 namespace midnight
 {
-	inline double radians(const double angle)
+	inline float radians(const float angle)
 	{
-		return angle * (std::numbers::pi / 180);
+		return angle * (std::numbers::pi_v<float> / 180);
 	}
 
-	inline double degrees(const double angle)
+	inline float degrees(const float angle)
 	{
 		return angle * (std::numbers::inv_pi * 180);
 	}
@@ -38,9 +38,9 @@ namespace midnight
 	{
 		Matrix<3, 1> mod{1, 1, 1};
 		using std::cos, std::sin;
-		const double radius{coordinate.radius};
-		const double heading{coordinate.heading};
-		const double pitch{coordinate.pitch};
+		const float radius{coordinate.radius};
+		const float heading{coordinate.heading};
+		const float pitch{coordinate.pitch};
 		mod.entry(0, 0) = radius * cos(pitch) * sin(heading);
 		mod.entry(1, 0) = -radius * sin(pitch);
 		mod.entry(2, 0) = radius * cos(pitch) * cos(heading);

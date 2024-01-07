@@ -6,8 +6,8 @@
 
 namespace midnight
 {
-	inline double radians(const double angle);
-	inline double degrees(const double angle);
+	inline float radians(const float angle);
+	inline float degrees(const float angle);
 	const char *readFile(const char *filename);
 
 	Matrix<3, 1> cartesian3(const Polar coordinate);

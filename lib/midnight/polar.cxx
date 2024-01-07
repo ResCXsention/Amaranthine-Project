@@ -15,17 +15,17 @@ namespace midnight
 		}
 		if (radius < 0) {
 			radius = -radius;
-			heading += std::numbers::pi;
-			pitch += std::numbers::pi;
+			heading += std::numbers::pi_v<float>;
+			pitch += std::numbers::pi_v<float>;
 		}
-		constexpr double half_pi{std::numbers::pi * 0.5};
-		constexpr double double_pi{std::numbers:: pi * 2};
+		constexpr float half_pi{std::numbers::pi_v<float> * 0.5};
+		constexpr float double_pi{std::numbers::pi_v<float> * 2};
 		if (std::fabs(pitch) > half_pi) {
 			pitch += half_pi;
 			pitch -= double_pi * std::floor(pitch / double_pi);
-			if (pitch > std::numbers::pi)
+			if (pitch > std::numbers::pi_v<float>)
 			{
-				heading += std::numbers::pi;
+				heading += std::numbers::pi_v<float>;
 				pitch = 3 * half_pi - pitch;
 			} else {
 				pitch -= half_pi;
@@ -33,10 +33,10 @@ namespace midnight
 		}
 		if (std::fabs(pitch) > half_pi * 0.9999) {
 			heading = 0.0f;
-		} else if (std::fabs(heading) > std::numbers::pi) {
-			heading += (std::numbers::pi);
+		} else if (std::fabs(heading) > std::numbers::pi_v<float>) {
+			heading += (std::numbers::pi_v<float>);
 			heading -= double_pi * std::floor(heading / double_pi);
-			heading -= std::numbers::pi;
+			heading -= std::numbers::pi_v<float>;
 		}
 	}
 

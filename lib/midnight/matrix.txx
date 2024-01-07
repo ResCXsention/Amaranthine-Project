@@ -3,9 +3,9 @@
 namespace midnight
 {
 	template<std::size_t R>
-	double dot(const Matrix<R, 1> v1, const Matrix<R, 1> v2)
+	float dot(const Matrix<R, 1> v1, const Matrix<R, 1> v2)
 	{
-		double mod{0};
+		float mod{0};
 		for (std::size_t i{0}; i < R; ++i) {
 			mod += v1.entry(i, 0) * v2.entry(i, 0);
 		}
@@ -13,7 +13,7 @@ namespace midnight
 	}
 
 	template<std::size_t R>
-	double length(const Matrix<R, 1> v)
+	float length(const Matrix<R, 1> v)
 	{
 		return std::sqrt(dot(v, v));
 	}
@@ -21,7 +21,7 @@ namespace midnight
 	template<std::size_t R>
 	Matrix<R, 1> normalise(const Matrix<R, 1> v)
 	{
-		const double l{length(v)};
+		const float l{length(v)};
 		return v * (1 / l);
 	}
 	
@@ -36,7 +36,7 @@ namespace midnight
 	}
 
 	template<std::size_t R, std::size_t C>
-	Matrix<R, C>::Matrix(const std::initializer_list<double> fill)
+	Matrix<R, C>::Matrix(const std::initializer_list<float> fill)
 	{
 		std::size_t i{0}, j{0};
 		assert(fill.size() == R * C && MIDNIGHT_WRONG_SIZE);
@@ -93,7 +93,7 @@ namespace midnight
 	}
 
 	template<std::size_t R, std::size_t C>
-	Matrix<R, C> &Matrix<R, C>::operator*=(const double other)
+	Matrix<R, C> &Matrix<R, C>::operator*=(const float other)
 	{
 		*this = *this * other;
 		return *this;
@@ -131,7 +131,7 @@ namespace midnight
 		Matrix<R, OC> mod;
 		for (std::size_t i{0}; i < R; ++i) {
 			for (std::size_t j{0}; j < OC; ++j) {
-				double dot_result{0};
+				float dot_result{0};
 				for (std::size_t k{0}; k < C; ++k) {
 					dot_result += entry(i, k) * other.entry(k, j);
 				}
@@ -142,7 +142,7 @@ namespace midnight
 	}
 
 	template<std::size_t R, std::size_t C>
-	Matrix<R, C> Matrix<R, C>::operator*(const double other) const
+	Matrix<R, C> Matrix<R, C>::operator*(const float other) const
 	{
 		Matrix<R, C> mod{*this};
 		for (std::size_t i{0}; i < R; ++i) {
@@ -165,31 +165,25 @@ namespace midnight
 	}
 	
 	template<std::size_t R, std::size_t C>
-	inline double &Matrix<R, C>::entry(const std::size_t r, const std::size_t c)
+	inline float &Matrix<R, C>::entry(const std::size_t r, const std::size_t c)
 	{
 		assert(r < R && MIDNIGHT_ERROR_ROW_OUTRANGE);
 		assert(c < C && MIDNIGHT_ERROR_COLUMN_OUTRANGE);
-		return data[r][c];
+		return data[C * c + r];
 	}
 
 	template<std::size_t R, std::size_t C>
-	inline const double &Matrix<R, C>::entry(const std::size_t r, const std::size_t c) const
+	inline const float &Matrix<R, C>::entry(const std::size_t r, const std::size_t c) const
 	{
 		assert(r < R && MIDNIGHT_ERROR_ROW_OUTRANGE);
 		assert(c < C && MIDNIGHT_ERROR_COLUMN_OUTRANGE);
-		return data[r][c];
+		return data[C * c + r];
 	}
 
 	template<std::size_t R, std::size_t C>
-	auto &Matrix<R, C>::dataPtr()
+	inline const float* const Matrix<R, C>::dataPtr() const
 	{
-		return data;
-	}
-
-	template<std::size_t R, std::size_t C>
-	inline const auto &Matrix<R, C>::dataPtr() const
-	{
-		return data;
+		return reinterpret_cast<const float*>(&data[0]);
 	}
 
 	template<std::size_t R, std::size_t C>
@@ -244,20 +238,20 @@ namespace midnight
 	}
 
 	template<std::size_t R, std::size_t C>
-	double Matrix<R, C>::determinant() const
+	float Matrix<R, C>::determinant() const
 	{
 		assert(R == C && MIDNIGHT_ERROR_NONSQUARE);
-		static auto compute{[](const Matrix<2, 2> m) -> double {
-			const double m00{m.entry(0, 0)};
-			const double m11{m.entry(1, 1)};
-			const double m01{m.entry(0, 1)};
-			const double m10{m.entry(1, 0)};
+		static auto compute{[](const Matrix<2, 2> m) -> float {
+			const float m00{m.entry(0, 0)};
+			const float m11{m.entry(1, 1)};
+			const float m01{m.entry(0, 1)};
+			const float m10{m.entry(1, 0)};
 			return (m00 * m11) - (m01 * m10);
 		}};
 		if constexpr (R == 2) {
 			return compute(*this);
 		}	else {
-			double mod{0};
+			float mod{0};
 			for (std::size_t j{0}; j < C; ++j) {
 				mod += this->entry(0, j) * std::pow(-1, j) * (this->minor(0, j).determinant());
 			}
