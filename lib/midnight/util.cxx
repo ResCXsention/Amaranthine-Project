@@ -1,5 +1,6 @@
 #include "util.hxx"
 
+#include <iostream>
 #include <numbers>
 #include <fstream>
 #include <cmath>
@@ -16,16 +17,20 @@ namespace midnight
 		return angle * (std::numbers::inv_pi * 180);
 	}
 
-	std::string readFile(const char *filename)
+	const char *readFile(const char *filename)
 	{
-		std::ifstream fs{filename, std::ios::binary | std::ios::ate};
-		if (!fs.is_open()) {
-			std::cout << "fail" << std::endl;
-		}
-		const auto size{fs.tellg()};
+		std::ifstream fs(filename, std::ios::binary | std::ios::ate);
+		fs.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		const long int size{static_cast<long int>(fs.tellg())};
 		fs.seekg(0);
-		std::string text(size, '\0');
-		fs.read(&text[0], size);
+		char *text{new char[size + 2]};
+		char next_char;
+		for (long int c{0}; c < size; ++c) {
+			fs.get(next_char);
+			text[c] = next_char;
+		}
+		fs.close();
+		text[size + 1] = '\0';
 		return text;
 	}
 
