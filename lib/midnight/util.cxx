@@ -40,10 +40,10 @@ namespace midnight
 		using std::cos, std::sin;
 		const float radius{coordinate.radius};
 		const float heading{coordinate.heading};
-		const float pitch{coordinate.pitch};
-		mod.entry(0, 0) = radius * cos(pitch) * sin(heading);
-		mod.entry(1, 0) = -radius * sin(pitch);
-		mod.entry(2, 0) = radius * cos(pitch) * cos(heading);
+		const float depression{coordinate.depression};
+		mod.entry(0, 0) = radius * cos(depression) * sin(heading);
+		mod.entry(1, 0) = -radius * sin(depression);
+		mod.entry(2, 0) = radius * cos(depression) * cos(heading);
 		return mod;
 	}
 
@@ -58,7 +58,7 @@ namespace midnight
 		Polar mod;
 		mod.radius = std::sqrt(dot(coordinate, coordinate));
 		mod.heading = std::atan2(coordinate.entry(0, 0), coordinate.entry(2, 0));
-		mod.pitch = std::asin(-coordinate.entry(1, 0) / mod.radius);
+		mod.depression = std::asin(-coordinate.entry(1, 0) / mod.radius);
 		mod.canonise();
 		return mod;
 	}

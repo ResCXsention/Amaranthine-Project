@@ -8,7 +8,7 @@ namespace midnight
 	public:
 		float radius{0};
 		float heading{0};
-		float pitch{0};
+		float depression{0};
 
 		void canonise();
 		void write() const;
