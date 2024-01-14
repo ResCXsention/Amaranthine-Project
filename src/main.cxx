@@ -71,7 +71,6 @@ std::array<unsigned int, 3> *sphericalObject(
 		indices.push_back(0);
 		indices.push_back(1 + lon);
 		indices.push_back(1 + (lon != longitudes - 1 ? lon + 1 : 0));
-
 	}
 	// connect latitudes to each other
 	if (latitudes > 1) {
