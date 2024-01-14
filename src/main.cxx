@@ -110,7 +110,7 @@ std::array<unsigned int, 3> *sphericalObject(
 	gl::glVertexAttribPointer(0, 3, gl::GL_FLOAT, false, 0, reinterpret_cast<void*>(0));
 
 	gl::glBindBuffer(gl::GL_ELEMENT_ARRAY_BUFFER, mod->at(2));
-	gl::glBufferData(gl::GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(float), indices.data(), gl::GL_STATIC_DRAW);
+	gl::glBufferData(gl::GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), gl::GL_STATIC_DRAW);
 
 	gl::glBindVertexArray(0);
 	gl::glBindBuffer(gl::GL_ARRAY_BUFFER, 0);
