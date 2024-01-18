@@ -29,10 +29,11 @@ namespace glfwcbs
 // #include <array>
 // #include <vector>
 // #include <numbers>
+// #include <iterator>
 // #include <midnight/matrix.hxx>
 // #include <midnight/polar.hxx>
 // #include <midnight/util.hxx>
-std::array<unsigned int, 3> *sphericalObject(
+std::array<unsigned int, 4> *sphericalObject(
 		const float radius,
 		const unsigned int longitudes,
 		const unsigned int latitudes)
@@ -65,7 +66,7 @@ std::array<unsigned int, 3> *sphericalObject(
 	points.insert(points.end(), {0, -radius, 0});
 
 	std::vector<unsigned int> indices;
-	indices.reserve((longitudes * latitudes) * 6);
+	indices.reserve(longitudes * latitudes * 6);
 	// connect top to first latitude
 	for (int lon{0}; lon < longitudes; ++lon) {
 		indices.push_back(0);
@@ -97,10 +98,47 @@ std::array<unsigned int, 3> *sphericalObject(
 		indices.push_back(1 + (latitudes - 1) * longitudes + (lon != longitudes - 1 ? lon + 1 : 0));
 		indices.push_back(1 + longitudes * latitudes);
 	}
-
-	std::array<unsigned int, 3> *mod{new std::array<unsigned int, 3>}; // vao, vbo, ibo
+	
+	std::vector<float> normals;
+	normals.reserve((longitudes * latitudes + 2) * 3);
+	std::vector<std::vector<unsigned int>> point_triangles(longitudes * latitudes + 2);
+	point_triangles.front().reserve(longitudes * 3);
+	point_triangles.back().reserve(longitudes * 3);
+	for (auto t{point_triangles.begin() + 1}; t != point_triangles.end() - 1; ++t) {
+		t->reserve(15);
+	}
+	// index triangles
+	for (auto t{indices.begin()}; t != indices.end(); t += 3) {
+		const unsigned int a{*t}, b{*(t + 1)}, c{*(t + 2)};
+		point_triangles.at(a).push_back(a);
+		point_triangles.at(a).push_back(b);
+		point_triangles.at(a).push_back(c);
+		point_triangles.at(b).push_back(a);
+		point_triangles.at(b).push_back(b);
+		point_triangles.at(b).push_back(c);
+		point_triangles.at(c).push_back(a);
+		point_triangles.at(c).push_back(b);
+		point_triangles.at(c).push_back(c);
+	}
+	// compute normals
+	for (int p{0}; p < longitudes * latitudes + 2; ++p) {
+		midnight::Vector3 n;
+		for (auto t{point_triangles.at(p).begin()}; t != point_triangles.at(p).end(); t += 3) {
+			const unsigned int a{*t}, b{*(t + 1)}, c{*(t + 2)};
+			const midnight::Vector3 v1{points.at(a * 3), points.at(a * 3 + 1), points.at(a * 3 + 2)};
+			const midnight::Vector3 v2{points.at(b * 3), points.at(b * 3 + 1), points.at(b * 3 + 2)};
+			const midnight::Vector3 v3{points.at(c * 3), points.at(c * 3 + 1), points.at(c * 3 + 2)};
+			n += midnight::cross(v2 - v1, v3 - v2);
+		}
+		n = midnight::normalise(n);
+		normals.push_back(n.entry(0, 0));
+		normals.push_back(n.entry(1, 0));
+		normals.push_back(n.entry(2, 0));
+	}
+	
+	auto *mod{new std::array<unsigned int, 4>}; // vao, vbo, ibo, normals
 	gl::glGenVertexArrays(1, &mod->at(0));
-	gl::glGenBuffers(2, &mod->at(1));
+	gl::glGenBuffers(3, &mod->at(1));
 	gl::glBindVertexArray(mod->at(0));
 
 	gl::glBindBuffer(gl::GL_ARRAY_BUFFER, mod->at(1));
@@ -108,11 +146,16 @@ std::array<unsigned int, 3> *sphericalObject(
 	gl::glEnableVertexAttribArray(0);
 	gl::glVertexAttribPointer(0, 3, gl::GL_FLOAT, false, 0, reinterpret_cast<void*>(0));
 
+	gl::glBindBuffer(gl::GL_ARRAY_BUFFER, mod->at(3));
+	gl::glBufferData(gl::GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), gl::GL_STATIC_DRAW);
+	gl::glEnableVertexAttribArray(1);
+	gl::glVertexAttribPointer(1, 3, gl::GL_FLOAT, false, 0, reinterpret_cast<void*>(0));
+
 	gl::glBindBuffer(gl::GL_ELEMENT_ARRAY_BUFFER, mod->at(2));
 	gl::glBufferData(gl::GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), gl::GL_STATIC_DRAW);
 
-	gl::glBindVertexArray(0);
 	gl::glBindBuffer(gl::GL_ARRAY_BUFFER, 0);
+	gl::glBindVertexArray(0);
 	gl::glBindBuffer(gl::GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	return mod;
@@ -125,8 +168,8 @@ int main()
 	const int default_win_h{600};
 
 	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	GLFWwindow *mw{glfwCreateWindow(default_win_w, default_win_h, "The Amaranthine Project", NULL, NULL)};
 	glfwSetFramebufferSizeCallback(mw, glfwcbs::framebufferSizeCb);
 	glfwMakeContextCurrent(mw);
@@ -175,19 +218,20 @@ int main()
 	gl::glDeleteShader(fragment_shader);
 
 	gl::glUseProgram(program);
+	// midnight::Matrix4x4 m{midnight::matrixTranslation(midnight::Vector3{0, -0, 0})};
 	midnight::Matrix4x4 m{midnight::matrixIdentity<4>()};
 	midnight::Matrix4x4 p{midnight::matrixPerspective(0.57, default_win_w / default_win_h, 0.001F, 2000)};
-	gl::glUniformMatrix4fv(100, 1, false, m.dataPtr());
-	gl::glUniformMatrix4fv(102, 1, false, p.dataPtr());
+	gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_model"), 1, false, m.dataPtr());
+	gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_projection"), 1, false, p.dataPtr());
 
-	std::array<unsigned int, 3> *sphere{sphericalObject(1, 10, 5)};
+	std::array<unsigned int, 4> *sphere{sphericalObject(1, 4, 2)};
 
 	while (!glfwWindowShouldClose(mw)) {
 		gl::glClear(gl::GL_COLOR_BUFFER_BIT);
 
 		gl::glBindVertexArray(sphere->at(0));
 		gl::glUseProgram(program);
-		gl::glDrawElements(gl::GL_TRIANGLES, 300, gl::GL_UNSIGNED_INT, reinterpret_cast<void*>(0));
+		gl::glDrawElements(gl::GL_TRIANGLES, 48, gl::GL_UNSIGNED_INT, reinterpret_cast<void*>(0));
 
 		/* m = midnight::matrixIdentity<4>();
 		m *= midnight::matrixTranslation(midnight::Vector3{0, 0, -1500});

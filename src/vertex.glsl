@@ -1,10 +1,13 @@
 #version 460 core
 
 layout (location = 0) in vec3 i_vertex;
+layout (location = 1) in vec3 i_normal;
 
-layout (location = 100) uniform mat4 u_model;
-layout (location = 101) uniform mat4 u_view = mat4(1.0);
-layout (location = 102) uniform mat4 u_projection = mat4(1.0);
+uniform mat4 u_model = mat4(1.0);
+uniform mat4 u_view = mat4(1.0);
+uniform mat4 u_projection = mat4(1.0);
+
+out vec3 ov_normal;
 
 void main()
 {

@@ -1,5 +1,7 @@
 #version 460 core
 
+in vec3 ov_normal;
+
 out vec4 o_fragment_colour;
 
 void main()
