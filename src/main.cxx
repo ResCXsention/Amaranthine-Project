@@ -227,11 +227,11 @@ int main()
 	gl::glDeleteShader(fragment_shader);
 
 	gl::glUseProgram(program);
-	midnight::Matrix4x4 i{midnight::matrixIdentity<4>()};
 	midnight::Matrix4x4 m{midnight::matrixTranslation(midnight::Vector3{0, 0, -10})};
+	midnight::Matrix4x4 v{midnight::matrixIdentity<4>()};
 	midnight::Matrix4x4 p{midnight::matrixPerspective(0.57, default_win_w / default_win_h, 0.001F, 2000)};
 	gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_model"), 1, false, m.dataPtr());
-	gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_view"), 1, false, i.dataPtr());
+	gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_view"), 1, false, v.dataPtr());
 	gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_projection"), 1, false, p.dataPtr());
 
 	std::array<unsigned int, 4> *sphere{sphericalObject(1, 4, 1)};
@@ -243,11 +243,11 @@ int main()
 		gl::glUseProgram(program);
 		gl::glDrawElements(gl::GL_TRIANGLES, 24, gl::GL_UNSIGNED_INT, reinterpret_cast<void*>(0));
 
-		/* m = midnight::matrixIdentity<4>();
-		m *= midnight::matrixTranslation(midnight::Vector3{0, 0, -1500});
-		m *= midnight::matrixRotation(midnight::Vector3{0, 1, 0}, glfwGetTime() * 0.5);
-		gl::glUniformMatrix4fv(100, 1, false, m.dataPtr());
-		gl::glDrawArrays(gl::GL_TRIANGLES, 0, 3); */
+		const float t{static_cast<const float>(glfwGetTime())};
+		midnight::Vector3 dir{midnight::cartesian3({1, std::cos(t), std::sin(t)})};
+		gl::glUniform3fv(gl::glGetUniformLocation(program, "u_light_dir"), 1, dir.dataPtr());
+		m *= midnight::matrixRotation(dir, 0.05);
+		gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_model"), 1, false, m.dataPtr());
 
 		glfwSwapBuffers(mw);
 		glfwPollEvents();
