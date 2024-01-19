@@ -31,7 +31,6 @@ namespace midnight
 		}
 		fs.close();
 		text[size] = '\0';
-		std::cout << text << std::endl;
 		return text;
 	}
 
