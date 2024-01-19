@@ -95,8 +95,8 @@ std::array<unsigned int, 4> *sphericalObject(
 	// the bottom point is defined as longitudes * latitudes + 1
 	for (int lon{0}; lon < longitudes; ++lon) {
 		indices.push_back(1 + (latitudes - 1) * longitudes + lon);
-		indices.push_back(1 + (latitudes - 1) * longitudes + (lon != longitudes - 1 ? lon + 1 : 0));
 		indices.push_back(1 + longitudes * latitudes);
+		indices.push_back(1 + (latitudes - 1) * longitudes + (lon != longitudes - 1 ? lon + 1 : 0));
 	}
 	
 	std::vector<float> normals;
