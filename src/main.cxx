@@ -185,24 +185,6 @@ int main()
 	glbinding::initialize(glfwGetProcAddress);
 	gl::glViewport(0, 0, default_win_w, default_win_h);
 
-	const double points[9]{
-		-200.0F, -200.0F, 0.0F,
-		200.0F, -200.0F, 0.0F,
-		0.0F, 200.0F, 0.0F
-	};
-	unsigned int vbo{0}, vao{0};
-	gl::glGenBuffers(1, &vbo);
-	gl::glGenVertexArrays(1, &vao);
-
-	gl::glBindVertexArray(vao);
-	gl::glBindBuffer(gl::GL_ARRAY_BUFFER, vbo);
-	gl::glBufferData(gl::GL_ARRAY_BUFFER, sizeof(points), points, gl::GL_STATIC_DRAW);
-	gl::glVertexAttribPointer(0, 3, gl::GL_DOUBLE, false, 3 * sizeof(float), reinterpret_cast<void*>(0));
-	gl::glEnableVertexAttribArray(0);
-
-	gl::glBindBuffer(gl::GL_ARRAY_BUFFER, 0);
-	gl::glBindVertexArray(0);
-
 	const char *vertex_source;
 	const char *fragment_source;
 	try {
@@ -234,14 +216,14 @@ int main()
 	gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_view"), 1, false, v.dataPtr());
 	gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_projection"), 1, false, p.dataPtr());
 
-	std::array<unsigned int, 4> *sphere{sphericalObject(1, 4, 1)};
+	std::array<unsigned int, 4> *sphere{sphericalObject(1, 4, 2)};
 
 	while (!glfwWindowShouldClose(mw)) {
 		gl::glClear(gl::GL_COLOR_BUFFER_BIT);
 
 		gl::glBindVertexArray(sphere->at(0));
 		gl::glUseProgram(program);
-		gl::glDrawElements(gl::GL_TRIANGLES, 24, gl::GL_UNSIGNED_INT, reinterpret_cast<void*>(0));
+		gl::glDrawElements(gl::GL_TRIANGLES, 48, gl::GL_UNSIGNED_INT, reinterpret_cast<void*>(0));
 
 		const float t{static_cast<const float>(glfwGetTime())};
 		midnight::Vector3 dir{midnight::cartesian3({1, std::cos(t), std::sin(t)})};
