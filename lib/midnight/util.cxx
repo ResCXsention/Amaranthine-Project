@@ -19,18 +19,19 @@ namespace midnight
 
 	const char *readFile(const char *filename)
 	{
-		std::ifstream fs(filename, std::ios::binary | std::ios::ate);
+		std::ifstream fs(filename, std::ios::ate);
 		fs.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-		const long int size{static_cast<long int>(fs.tellg())};
+		const long size{fs.tellg()};
 		fs.seekg(0);
-		char *text{new char[size + 2]};
+		char *text{new char[size + 1]};
 		char next_char;
 		for (long int c{0}; c < size; ++c) {
 			fs.get(next_char);
 			text[c] = next_char;
 		}
 		fs.close();
-		text[size + 1] = '\0';
+		text[size] = '\0';
+		std::cout << text << std::endl;
 		return text;
 	}
 
