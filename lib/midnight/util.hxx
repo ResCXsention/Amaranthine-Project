@@ -1,11 +1,14 @@
 #ifndef LIB_MIDNIGHT_UTIL
 #define LIB_MIDNIGHT_UTIL
 
-#include "matrix.hxx"
-#include "polar.hxx"
+#include <cstddef>
 
 namespace midnight
 {
+	template<std::size_t R, std::size_t C>
+	struct Matrix;
+	struct Polar;
+
 	inline float radians(const float angle);
 	inline float degrees(const float angle);
 	const char *readFile(const char *filename);

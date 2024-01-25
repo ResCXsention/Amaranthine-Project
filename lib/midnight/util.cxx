@@ -5,6 +5,9 @@
 #include <fstream>
 #include <cmath>
 
+#include "matrix.hxx"
+#include "polar.hxx"
+
 namespace midnight
 {
 	inline float radians(const float angle)
