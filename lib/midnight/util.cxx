@@ -1,12 +1,11 @@
-#include "util.hxx"
+#include <util.hxx>
 
-#include <iostream>
 #include <numbers>
 #include <fstream>
 #include <cmath>
 
-#include "matrix.hxx"
-#include "polar.hxx"
+#include <matrix.hxx>
+#include <polar.hxx>
 
 namespace midnight
 {

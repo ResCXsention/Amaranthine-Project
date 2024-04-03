@@ -1,4 +1,4 @@
-#include "matrix.hxx"
+#include <matrix.hxx>
 
 namespace midnight
 {

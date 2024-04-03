@@ -7,15 +7,15 @@
 #include <initializer_list>
 #include <iostream>
 
+#define MIDNIGHT_ERROR_ROW_OUTRANGE "midnight, row out of range"
+#define MIDNIGHT_ERROR_COLUMN_OUTRANGE "midnight, column outof range"
+#define MIDNIGHT_ERROR_DIMENSION_MISMATCH "midnight, matrix dimensions wrong"
+#define MIDNIGHT_ERROR_NONSQUARE "midnight, matrix isn't a square"
+#define MIDNIGHT_ERROR_ZERO "midnight, zero"
+#define MIDNIGHT_WRONG_SIZE "midnight, wrong size"
+
 namespace midnight
 {
-	static const char *MIDNIGHT_ERROR_ROW_OUTRANGE{"Midnight, row out of range"};
-	static const char *MIDNIGHT_ERROR_COLUMN_OUTRANGE{"Midnight, column out of range"};
-	static const char *MIDNIGHT_ERROR_DIMENSION_MISMATCH{"Midnight, matrix dimensions unworkable"};
-	static const char *MIDNIGHT_ERROR_NONSQUARE{"Midnight, this matrix isn't a square"};
-	static const char *MIDNIGHT_ERROR_ZERO{"Midnight, determinant is zero"};
-	static const char *MIDNIGHT_WRONG_SIZE{"Midnight, matrix construct initaliser list of wrong length"};
-
 	template<std::size_t R, std::size_t C>
 	struct Matrix;
 
