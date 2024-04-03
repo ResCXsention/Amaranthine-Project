@@ -14,9 +14,7 @@
 #include <glbinding/glbinding.h>
 #include <GLFW/glfw3.h>
 
-#include <midnight/matrix.hxx>
-#include <midnight/polar.hxx>
-#include <midnight/util.hxx>
+#include <midnight.hxx>
 
 namespace glfwcbs
 {
