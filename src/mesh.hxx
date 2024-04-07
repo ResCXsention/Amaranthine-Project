@@ -15,6 +15,7 @@ namespace res
 				);
 
 		unsigned int get_vao() const;
+		unsigned int get_index_count() const;
 
 	private:
 		std::vector<float> vertices;

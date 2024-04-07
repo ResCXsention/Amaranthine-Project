@@ -51,6 +51,11 @@ namespace res
 		return vao;
 	}
 
+	unsigned int Mesh::get_index_count() const
+	{
+		return indices.size();
+	}
+
 #if !defined(NDEBUG) && defined(LIB_MIDNIGHT_MATRIX) && defined(LIB_MIDNIGHT_POLAR) && defined(LIB_MIDNIGHT_UTIL)
 	Mesh spherical_mesh(
 		const float radius,

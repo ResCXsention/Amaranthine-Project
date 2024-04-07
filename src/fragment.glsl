@@ -16,5 +16,6 @@ void main()
 	const vec3 diffuse_colour = material_colour * light_colour * cos_theta / (distance * distance);
 	const vec3 ambient_colour = vec3(0.1F, 0.1F, 0.1F) * material_colour;
 	const vec3 colour = diffuse_colour + ambient_colour;
+	//const vec3 colour = vec3(1.0F, 1.0F, 1.0F);
 	of_fragment_colour = vec4(colour.xyz, 1.0F);
 }

@@ -16,6 +16,7 @@
 
 #include <midnight.hxx>
 #include <mesh.hxx>
+#include <model.hxx>
 
 namespace glfwcbs
 {
@@ -76,19 +77,19 @@ int main()
 	gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_projection"), 1, false, p.dataPtr());
 
 	const int l1{100}, l2{80};
-	res::Mesh sphere_mesh{res::spherical_mesh(1, l1, l2)};
+	//res::Mesh sphere_mesh{res::spherical_mesh(1, l1, l2)};
+	res::Model boat("boat.obj");
 
 	while (!glfwWindowShouldClose(mw)) {
 		gl::glClear(gl::GL_COLOR_BUFFER_BIT);
 
 		gl::glUseProgram(program);
-		gl::glBindVertexArray(sphere_mesh.get_vao());
-		gl::glDrawElements(gl::GL_TRIANGLES, l1 * l2 * 6, gl::GL_UNSIGNED_INT, reinterpret_cast<void*>(0));
+		boat.draw();
 
 		const float t{static_cast<const float>(glfwGetTime())};
 		midnight::Vector3 dir{midnight::cartesian3({1, std::sin(t), std::sin(t)})};
 		gl::glUniform3fv(gl::glGetUniformLocation(program, "u_light_dir"), 1, dir.dataPtr());
-		m *= midnight::matrixRotation(dir, 0.05);
+		m *= midnight::matrixRotation(midnight::Vector3{0, 1, 0}, 0.1);
 		gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_model"), 1, false, m.dataPtr());
 
 		glfwSwapBuffers(mw);
