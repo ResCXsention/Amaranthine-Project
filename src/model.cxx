@@ -7,13 +7,13 @@
 
 namespace res
 {
-	Model::Model(const std::string path)
+	void Model::index_asset(const std::string path)
 	{
 		static Assimp::Importer importer;
 		const aiScene *mesh_scene{importer.ReadFile(path, aiProcess_Triangulate)};
 		if (mesh_scene == nullptr) std::cout << importer.GetErrorString() << std::endl;
 
-		process_node(mesh_scene->mRootNode, mesh_scene);
+		process_ainode(mesh_scene->mRootNode, mesh_scene);
 	}
 
 	void Model::draw()
@@ -25,7 +25,7 @@ namespace res
 		}
 	}
 
-	void Model::process_node(aiNode *node, const aiScene *scene)
+	void Model::process_ainode(aiNode *node, const aiScene *scene)
 	{
 		for (unsigned int i{0}; i < node->mNumMeshes; ++i) {
 			aiMesh *mesh{scene -> mMeshes[node->mMeshes[i]]};
@@ -51,7 +51,7 @@ namespace res
 			meshes.push_back(Mesh(vertices, normals, indices));
 		}
 		for (unsigned int i{0}; i < node->mNumChildren; ++i) {
-			process_node(node->mChildren[i], scene);
+			process_ainode(node->mChildren[i], scene);
 		}
 	}
 }

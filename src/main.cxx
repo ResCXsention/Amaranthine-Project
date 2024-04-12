@@ -44,6 +44,7 @@ int main()
 
 	gl::glEnable(gl::GL_CULL_FACE);
 	gl::glCullFace(gl::GL_BACK);
+	gl::glEnable(gl::GL_DEPTH_TEST);
 
 	const char *vertex_source;
 	const char *fragment_source;
@@ -78,10 +79,11 @@ int main()
 
 	const int l1{100}, l2{80};
 	//res::Mesh sphere_mesh{res::spherical_mesh(1, l1, l2)};
-	res::Model boat("boat.obj");
+	res::Model boat;
+	boat.index_asset("boat.obj");
 
 	while (!glfwWindowShouldClose(mw)) {
-		gl::glClear(gl::GL_COLOR_BUFFER_BIT);
+		gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
 
 		gl::glUseProgram(program);
 		boat.draw();

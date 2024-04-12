@@ -11,13 +11,14 @@ namespace res
 	class Model final
 	{
 	public:
-		explicit Model(const std::string path);
+		Model() = default;
+		void index_asset(const std::string path);
 		void draw();
 
 	private:
 		std::vector<Mesh> meshes;
 		
-		void process_node(aiNode *node, const aiScene *scene);
+		void process_ainode(aiNode *node, const aiScene *scene);
 	};
 }
 
