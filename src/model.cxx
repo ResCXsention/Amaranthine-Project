@@ -13,7 +13,11 @@ namespace res
 		const aiScene *mesh_scene{importer.ReadFile(path, aiProcess_Triangulate)};
 		if (mesh_scene == nullptr) std::cout << importer.GetErrorString() << std::endl;
 
-		process_ainode(mesh_scene->mRootNode, mesh_scene);
+		std::vector<float> vertices;
+		std::vector<float> normals;
+		std::vector<unsigned int> indices;
+		process_ainode(mesh_scene->mRootNode, mesh_scene, vertices, normals, indices);
+		meshes.push_back(Mesh(vertices, normals, indices));
 	}
 
 	void Model::draw()
@@ -25,14 +29,18 @@ namespace res
 		}
 	}
 
-	void Model::process_ainode(aiNode *node, const aiScene *scene)
+	void Model::process_ainode(
+			aiNode *node,
+			const aiScene *scene,
+			std::vector<float> &vertices,
+			std::vector<float> &normals,
+			std::vector<unsigned int> &indices
+			)
 	{
+		const unsigned long index_offset{vertices.size() / 3};
 		for (unsigned int i{0}; i < node->mNumMeshes; ++i) {
-			aiMesh *mesh{scene -> mMeshes[node->mMeshes[i]]};
+			aiMesh *mesh{scene->mMeshes[node->mMeshes[i]]};
 
-			std::vector<float> vertices;
-			std::vector<float> normals;
-			std::vector<unsigned int> indices;
 			for (unsigned int i{0}; i < mesh->mNumVertices; ++i) {
 				vertices.push_back(mesh->mVertices[i].x);
 				vertices.push_back(mesh->mVertices[i].y);
@@ -44,14 +52,12 @@ namespace res
 			for (unsigned int i{0}; i < mesh->mNumFaces; ++i) {
 				aiFace face{mesh->mFaces[i]};
 				for (unsigned int j{0}; j < face.mNumIndices; ++j) {
-					indices.push_back(face.mIndices[j]);
+					indices.push_back(face.mIndices[j] + index_offset);
 				}
 			}
-
-			meshes.push_back(Mesh(vertices, normals, indices));
 		}
 		for (unsigned int i{0}; i < node->mNumChildren; ++i) {
-			process_ainode(node->mChildren[i], scene);
+			process_ainode(node->mChildren[i], scene, vertices, normals, indices);
 		}
 	}
 }

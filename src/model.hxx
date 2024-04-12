@@ -18,7 +18,13 @@ namespace res
 	private:
 		std::vector<Mesh> meshes;
 		
-		void process_ainode(aiNode *node, const aiScene *scene);
+		void process_ainode(
+				aiNode *node,
+				const aiScene *scene,
+				std::vector<float> &vertices,
+				std::vector<float> &normals,
+				std::vector<unsigned int> &indices
+				);
 	};
 }
 
