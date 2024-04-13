@@ -16,7 +16,7 @@ namespace res
 		std::vector<float> vertices;
 		std::vector<float> normals;
 		std::vector<unsigned int> indices;
-		process_ainode(mesh_scene->mRootNode, mesh_scene, vertices, normals, indices);
+		process_ainode(mesh_scene->mRootNode, mesh_scene);
 		meshes.push_back(Mesh(vertices, normals, indices));
 	}
 
@@ -29,18 +29,13 @@ namespace res
 		}
 	}
 
-	void Model::process_ainode(
-			aiNode *node,
-			const aiScene *scene,
-			std::vector<float> &vertices,
-			std::vector<float> &normals,
-			std::vector<unsigned int> &indices
-			)
+	void Model::process_ainode(aiNode *node, const aiScene *scene)
 	{
-		const unsigned long index_offset{vertices.size() / 3};
 		for (unsigned int i{0}; i < node->mNumMeshes; ++i) {
 			aiMesh *mesh{scene->mMeshes[node->mMeshes[i]]};
 
+			std::vector<float> vertices, normals;
+			std::vector<unsigned int> indices;
 			for (unsigned int i{0}; i < mesh->mNumVertices; ++i) {
 				vertices.push_back(mesh->mVertices[i].x);
 				vertices.push_back(mesh->mVertices[i].y);
@@ -52,12 +47,13 @@ namespace res
 			for (unsigned int i{0}; i < mesh->mNumFaces; ++i) {
 				aiFace face{mesh->mFaces[i]};
 				for (unsigned int j{0}; j < face.mNumIndices; ++j) {
-					indices.push_back(face.mIndices[j] + index_offset);
+					indices.push_back(face.mIndices[j]);
 				}
 			}
+			meshes.push_back(Mesh(vertices, normals, indices));
 		}
 		for (unsigned int i{0}; i < node->mNumChildren; ++i) {
-			process_ainode(node->mChildren[i], scene, vertices, normals, indices);
+			process_ainode(node->mChildren[i], scene);
 		}
 	}
 }
