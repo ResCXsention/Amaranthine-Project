@@ -13,11 +13,7 @@ namespace res
 		const aiScene *mesh_scene{importer.ReadFile(path, aiProcess_Triangulate)};
 		if (mesh_scene == nullptr) std::cout << importer.GetErrorString() << std::endl;
 
-		std::vector<float> vertices;
-		std::vector<float> normals;
-		std::vector<unsigned int> indices;
 		process_ainode(mesh_scene->mRootNode, mesh_scene);
-		meshes.push_back(Mesh(vertices, normals, indices));
 	}
 
 	void Model::draw()

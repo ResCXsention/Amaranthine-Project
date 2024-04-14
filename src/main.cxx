@@ -17,6 +17,8 @@
 #include <midnight.hxx>
 #include <mesh.hxx>
 #include <model.hxx>
+#include <resource.hxx>
+#include <text_resource.hxx>
 
 namespace glfwcbs
 {
@@ -46,15 +48,11 @@ int main()
 	gl::glCullFace(gl::GL_BACK);
 	gl::glEnable(gl::GL_DEPTH_TEST);
 
-	const char *vertex_source;
-	const char *fragment_source;
-	try {
-		vertex_source = midnight::readFile("../src/vertex.glsl");
-		fragment_source = midnight::readFile("../src/fragment.glsl");
-	} catch (const std::ios_base::failure &e) {
-		std::cout << "exception, attempt to read a nonexistent file: " << e.what() << std::endl;
-		std::terminate();
-	}
+	res::ResourceController<res::TextResource> rc;
+	rc.index("s_vertex", "../src/vertex.glsl");
+	rc.index("s_fragment", "../src/fragment.glsl");
+	const char *vertex_source{rc.retrieve("s_vertex").lock()->get_text()};
+	const char *fragment_source{rc.retrieve("s_fragment").lock()->get_text()};
 	unsigned int program{gl::glCreateProgram()};
 	unsigned int vertex_shader{gl::glCreateShader(gl::GL_VERTEX_SHADER)};
 	unsigned int fragment_shader{gl::glCreateShader(gl::GL_FRAGMENT_SHADER)};
