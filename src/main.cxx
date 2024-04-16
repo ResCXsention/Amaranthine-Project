@@ -15,10 +15,9 @@
 #include <GLFW/glfw3.h>
 
 #include <midnight.hxx>
-#include <mesh.hxx>
-#include <model.hxx>
 #include <resource.hxx>
 #include <text_resource.hxx>
+#include <model_resource.hxx>
 
 namespace glfwcbs
 {
@@ -77,14 +76,20 @@ int main()
 
 	const int l1{100}, l2{80};
 	//res::Mesh sphere_mesh{res::spherical_mesh(1, l1, l2)};
-	res::Model boat;
-	boat.index_asset("boat.obj");
+	
+	res::ResourceController<res::ModelResource> mc;
+	mc.index("m_boat", "boat.obj");
+	std::vector<res::ModelResource::Mesh> boat_meshes{mc.retrieve("m_boat").lock()->get_meshes()};
 
 	while (!glfwWindowShouldClose(mw)) {
 		gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
 
 		gl::glUseProgram(program);
-		boat.draw();
+
+		for (auto mesh : boat_meshes) {
+			gl::glBindVertexArray(mesh.get_vao());
+			gl::glDrawElements(gl::GL_TRIANGLES, mesh.get_index_count(), gl::GL_UNSIGNED_INT, reinterpret_cast<void*>(0));
+		}
 
 		const float t{static_cast<const float>(glfwGetTime())};
 		midnight::Vector3 dir{midnight::cartesian3({1, std::sin(t), std::sin(t)})};
