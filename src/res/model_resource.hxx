@@ -40,6 +40,14 @@ namespace res
 
 		void load_ainode(aiNode *node, const aiScene *scene);
 	};
+
+#ifndef NDEBUG
+	ModelResource::Mesh spherical_mesh(
+		const float radius,
+		const unsigned int longitudes,
+		const unsigned int latitudes
+		);
+#endif
 }
 
 #endif
