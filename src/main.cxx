@@ -48,8 +48,8 @@ int main()
 	gl::glEnable(gl::GL_DEPTH_TEST);
 
 	res::ResourceController<res::TextResource> rc;
-	rc.index("s_vertex", "../src/vertex.glsl");
-	rc.index("s_fragment", "../src/fragment.glsl");
+	rc.index("s_vertex", "../src/shaders/vertex.glsl");
+	rc.index("s_fragment", "../src/shaders/fragment.glsl");
 	const char *vertex_source{rc.retrieve("s_vertex").lock()->get_text()};
 	const char *fragment_source{rc.retrieve("s_fragment").lock()->get_text()};
 	unsigned int program{gl::glCreateProgram()};
