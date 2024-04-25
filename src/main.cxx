@@ -16,6 +16,7 @@
 
 #include <midnight.hxx>
 #include <resource.hxx>
+#include <node.hxx>
 #include <text_resource.hxx>
 #include <model_resource.hxx>
 
@@ -75,27 +76,31 @@ int main()
 	gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_projection"), 1, false, p.dataPtr());
 
 	const int l1{100}, l2{80};
-	//res::Mesh sphere_mesh{res::spherical_mesh(1, l1, l2)};
+	res::Node node;
+	node.set_shader_program(program);
 	
 	res::ResourceController<res::ModelResource> mc;
 	mc.index("m_boat", "boat.obj");
 	std::vector<res::ModelResource::Mesh> boat_meshes{mc.retrieve("m_boat").lock()->get_meshes()};
+	node.set_model(mc.retrieve("m_boat"));
 
 	while (!glfwWindowShouldClose(mw)) {
 		gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
 
-		gl::glUseProgram(program);
 
-		for (auto mesh : boat_meshes) {
-			gl::glBindVertexArray(mesh.get_vao());
-			gl::glDrawElements(gl::GL_TRIANGLES, mesh.get_index_count(), gl::GL_UNSIGNED_INT, reinterpret_cast<void*>(0));
-		}
+		node.update_and_render(midnight::matrixIdentity<4>());
+		// for (auto &mesh : boat_meshes) {
+		// 	gl::glBindVertexArray(mesh.get_vao());
+		// 	gl::glDrawElements(gl::GL_TRIANGLES, mesh.get_index_count(), gl::GL_UNSIGNED_INT, reinterpret_cast<void*>(0));
+		// }
 
 		const float t{static_cast<const float>(glfwGetTime())};
 		midnight::Vector3 dir{midnight::cartesian3({1, std::sin(t), std::sin(t)})};
 		gl::glUniform3fv(gl::glGetUniformLocation(program, "u_light_dir"), 1, dir.dataPtr());
 		m *= midnight::matrixRotation(midnight::Vector3{0, 1, 0}, 0.1);
-		gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_model"), 1, false, m.dataPtr());
+		node.set_transform(m);
+		//gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_model"), 1, false, m.dataPtr());
+
 
 		glfwSwapBuffers(mw);
 		glfwPollEvents();
