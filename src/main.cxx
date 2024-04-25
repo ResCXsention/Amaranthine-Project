@@ -88,7 +88,7 @@ int main()
 		gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
 
 
-		node.update_and_render(midnight::matrixIdentity<4>());
+		node.update_and_render();
 		// for (auto &mesh : boat_meshes) {
 		// 	gl::glBindVertexArray(mesh.get_vao());
 		// 	gl::glDrawElements(gl::GL_TRIANGLES, mesh.get_index_count(), gl::GL_UNSIGNED_INT, reinterpret_cast<void*>(0));

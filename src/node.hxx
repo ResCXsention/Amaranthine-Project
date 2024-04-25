@@ -28,7 +28,7 @@ namespace res
 		void set_shader_program(const unsigned int shader_program);
 		void set_model(std::weak_ptr<res::ModelResource> model);
 		void set_uniform_preset_function(std::function<preset_uniforms_signature> function);
-		void update_and_render(const midnight::Matrix4x4 current_transform);
+		void update_and_render(const midnight::Matrix4x4 current_transform = midnight::matrixIdentity<4>());
 
 	private:
 		midnight::Matrix4x4 node_transform;
