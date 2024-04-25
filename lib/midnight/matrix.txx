@@ -28,7 +28,7 @@ namespace midnight
 	template<std::size_t D>
 	Matrix<D, D> matrixIdentity()
 	{
-		Matrix<D, D> mod;
+		static Matrix<D, D> mod;
 		for (std::size_t i{0}; i < D; ++i) {
 			mod.entry(i, i) = 1;
 		}
