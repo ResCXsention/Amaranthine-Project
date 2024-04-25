@@ -48,6 +48,19 @@ namespace res
 		gl::glBindBuffer(gl::GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
+	ModelResource::Mesh::Mesh(const Mesh &other)
+		:Mesh(other.vertices, other.normals, other.indices)
+	{
+	}
+
+	ModelResource::Mesh::~Mesh()
+	{
+		gl::glDeleteVertexArrays(1, &vao);
+		gl::glDeleteBuffers(1, &vbo);
+		gl::glDeleteBuffers(1, &ebo);
+		gl::glDeleteBuffers(1, &nbo);
+	}
+
 	unsigned int ModelResource::Mesh::get_vao() const
 	{
 		return vao;

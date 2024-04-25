@@ -18,9 +18,13 @@ namespace res
 					const std::vector<float> normals,
 					const std::vector<unsigned int> indices
 					);
+			Mesh(const Mesh &other);
+			~Mesh();
 
 			unsigned int get_vao() const;
 			unsigned int get_index_count() const;
+
+			Mesh &operator=(const Mesh &other) = delete;
 
 		private:
 			std::vector<float> vertices;
