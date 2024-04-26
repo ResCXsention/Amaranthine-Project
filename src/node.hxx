@@ -23,6 +23,7 @@ namespace res
 
 		void operator=(const Node &other) = delete;
 
+		void add_child(Node *node);
 		void set_transform(const midnight::Matrix4x4 transform);
 		midnight::Matrix4x4 get_transform() const;
 		void set_shader_program(const unsigned int shader_program);
@@ -32,7 +33,7 @@ namespace res
 
 	private:
 		midnight::Matrix4x4 node_transform;
-		std::vector<Node> children;
+		std::vector<Node*> children;
 		std::function<preset_uniforms_signature> preset_uniforms{default_preset_uniforms};
 		unsigned int shader_program{0};
 		std::weak_ptr<res::ModelResource> model;

@@ -5,6 +5,10 @@
 
 namespace res
 {
+	void Node::add_child(Node *node)
+	{
+		children.push_back(node);
+	}
 
 	void Node::set_transform(const midnight::Matrix4x4 transform)
 	{
@@ -53,8 +57,8 @@ namespace res
 			std::cerr << "Node, model or shader unset.\n";
 		}
 
-		for (Node &child : children) {
-			child.update_and_render(node_transform * current_transform);
+		for (auto child : children) {
+			child->update_and_render(node_transform * current_transform);
 		}
 	}
 

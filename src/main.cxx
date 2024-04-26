@@ -76,19 +76,28 @@ int main()
 	gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_projection"), 1, false, p.dataPtr());
 
 	const int l1{100}, l2{80};
-	res::Node node;
-	node.set_shader_program(program);
+	res::Node *hull{new res::Node}, *rear_turret{new res::Node}, *forward_turret{new res::Node};
+	hull->set_shader_program(program);
+	rear_turret->set_shader_program(program);
+	forward_turret->set_shader_program(program);
 	
 	res::ResourceController<res::ModelResource> mc;
 	mc.index("m_boat", "boat.obj");
-	std::vector<res::ModelResource::Mesh> boat_meshes{mc.retrieve("m_boat").lock()->get_meshes()};
-	node.set_model(mc.retrieve("m_boat"));
+	mc.index("m_ags", "ags.obj");
+	hull->set_model(mc.retrieve("m_boat"));
+	rear_turret->set_model(mc.retrieve("m_ags"));
+	forward_turret->set_model(mc.retrieve("m_ags"));
+
+	hull->add_child(rear_turret);
+	hull->add_child(forward_turret);
+	
+	hull->set_transform(m);
+	rear_turret->set_transform(midnight::matrixTranslation(midnight::Vector3{-0.61, 0.15, 0}));
+	forward_turret->set_transform(midnight::matrixTranslation(midnight::Vector3{-1.15, 0.15, 0}));
 
 	while (!glfwWindowShouldClose(mw)) {
 		gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
 
-
-		node.update_and_render();
 		// for (auto &mesh : boat_meshes) {
 		// 	gl::glBindVertexArray(mesh.get_vao());
 		// 	gl::glDrawElements(gl::GL_TRIANGLES, mesh.get_index_count(), gl::GL_UNSIGNED_INT, reinterpret_cast<void*>(0));
@@ -98,9 +107,9 @@ int main()
 		midnight::Vector3 dir{midnight::cartesian3({1, std::sin(t), std::sin(t)})};
 		gl::glUniform3fv(gl::glGetUniformLocation(program, "u_light_dir"), 1, dir.dataPtr());
 		m *= midnight::matrixRotation(midnight::Vector3{0, 1, 0}, 0.1);
-		node.set_transform(m);
-		//gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_model"), 1, false, m.dataPtr());
-
+		
+		hull->set_transform(m);
+		hull->update_and_render();
 
 		glfwSwapBuffers(mw);
 		glfwPollEvents();
