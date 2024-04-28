@@ -2,7 +2,7 @@
 #define RES_NODE
 
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <iostream>
 #include <midnight.hxx>
 #include <component.hxx>
@@ -48,7 +48,7 @@ namespace res
 		System *owning_system;
 		midnight::Matrix4x4 transform{midnight::matrixIdentity<4>()};
 		std::vector<Node*> children;
-		std::map<unsigned int, Component*> components;
+		std::unordered_map<unsigned int, Component*> components;
 
 
 		friend class System;
