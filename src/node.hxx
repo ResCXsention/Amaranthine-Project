@@ -2,43 +2,73 @@
 #define RES_NODE
 
 #include <vector>
-#include <memory>
-#include <functional>
+#include <map>
+#include <iostream>
 #include <midnight.hxx>
-#include <model_resource.hxx>
+#include <component.hxx>
 
 namespace res
 {
-	using preset_uniforms_signature = void(const int, const midnight::Matrix4x4);
-	void default_preset_uniforms(
-			const int program,
-			const midnight::Matrix4x4 node_matrix
-			);
+	class System;
+	class Component;
+
+	template<class T>
+	concept ComponentType = std::is_base_of<Component, T>::value;
+	static inline unsigned int unique_component_id()
+	{
+		static unsigned int id{0};
+		return id++;
+	}
+	template<ComponentType T>
+	static unsigned int component_id()
+	{
+		static unsigned int id{unique_component_id()};
+		return id;
+	}
 
 	class Node final
 	{
 	public:
 		Node() = default;
-		Node(const Node &other) = delete;
+		// Node(const Node &other);
 
 		void operator=(const Node &other) = delete;
 
-		void add_child(Node *node);
+		Node *add_child();
 		void set_transform(const midnight::Matrix4x4 transform);
 		midnight::Matrix4x4 get_transform() const;
-		void set_shader_program(const unsigned int shader_program);
-		void set_model(std::weak_ptr<res::ModelResource> model);
-		void set_uniform_preset_function(std::function<preset_uniforms_signature> function);
-		void update_and_render(const midnight::Matrix4x4 current_transform = midnight::matrixIdentity<4>());
+
+		template<ComponentType T>
+		void add_component();
+		template<ComponentType T>
+		T *get_component();
+		void cycle(const midnight::Matrix4x4 current_transform = midnight::matrixIdentity<4>());
 
 	private:
-		midnight::Matrix4x4 node_transform;
+		System *owning_system;
+		midnight::Matrix4x4 transform{midnight::matrixIdentity<4>()};
 		std::vector<Node*> children;
-		std::function<preset_uniforms_signature> preset_uniforms{default_preset_uniforms};
-		unsigned int shader_program{0};
-		std::weak_ptr<res::ModelResource> model;
+		std::map<unsigned int, Component*> components;
 
+
+		friend class System;
 	};
+
+	template<ComponentType T>
+	void Node::add_component()
+	{
+		if (components.contains(component_id<T>())) {
+			std::cerr << "Node, attempted to add a component that already exists.\n";
+		}
+		components[component_id<T>()] = new T();
+		components[component_id<T>()]->owning_node = this;
+	}
+
+	template<ComponentType T>
+	T *Node::get_component()
+	{
+		return dynamic_cast<T*>(components[component_id<T>()]);
+	}
 }
 
 #endif
