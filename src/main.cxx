@@ -54,6 +54,7 @@ int main()
 	res::ResourceController<res::TextResource> rc;
 	rc.index("s_vertex", "../src/shaders/vertex.glsl");
 	rc.index("s_fragment", "../src/shaders/fragment.glsl");
+	rc.index("s_water_fragment", "../src/shaders/water_fragment.glsl");
 	const char *vertex_source{rc.retrieve("s_vertex").lock()->get_text()};
 	const char *fragment_source{rc.retrieve("s_fragment").lock()->get_text()};
 	unsigned int program{gl::glCreateProgram()};
@@ -66,8 +67,17 @@ int main()
 	gl::glAttachShader(program, vertex_shader);
 	gl::glAttachShader(program, fragment_shader);
 	gl::glLinkProgram(program);
+	unsigned int water_program{gl::glCreateProgram()};
+	const char *water_fragment_source{rc.retrieve("s_water_fragment").lock()->get_text()};
+	unsigned int water_fragment_shader{gl::glCreateShader(gl::GL_FRAGMENT_SHADER)};
+	gl::glShaderSource(water_fragment_shader, 1, &water_fragment_source, NULL);
+	gl::glCompileShader(water_fragment_shader);
+	gl::glAttachShader(water_program, vertex_shader);
+	gl::glAttachShader(water_program, water_fragment_shader);
+	gl::glLinkProgram(water_program);
 	gl::glDeleteShader(vertex_shader);
 	gl::glDeleteShader(fragment_shader);
+	gl::glDeleteShader(water_fragment_shader);
 
 	gl::glUseProgram(program);
 	midnight::Matrix4x4 m{midnight::matrixTranslation(midnight::Vector3{0, 0, -10})};
