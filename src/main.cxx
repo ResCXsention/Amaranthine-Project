@@ -17,9 +17,10 @@
 #include <midnight.hxx>
 #include <resource.hxx>
 #include <node.hxx>
-#include <system.hxx>
+#include <scene.hxx>
 #include <component.hxx>
 #include <drawable_component.hxx>
+#include <camera_component.hxx>
 #include <text_resource.hxx>
 #include <model_resource.hxx>
 
@@ -84,17 +85,27 @@ int main()
 	m *= midnight::matrixRotation(midnight::Vector3{-1, 0, 0}, 0.1);
 	midnight::Matrix4x4 v{midnight::matrixIdentity<4>()};
 	midnight::Matrix4x4 p{midnight::matrixPerspective(0.57, default_win_w / default_win_h, 0.001F, 2000)};
-	gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_model"), 1, false, m.dataPtr());
-	gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_view"), 1, false, v.dataPtr());
-	gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_projection"), 1, false, p.dataPtr());
+	// gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_model"), 1, false, m.dataPtr());
+	// gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_view"), 1, false, v.dataPtr());
+	// gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_projection"), 1, false, p.dataPtr());
 
-	res::Node *hull{new res::Node}, *rear_turret{hull->add_child()}, *forward_turret{hull->add_child()};
+	res::Scene main_scene;
+
+	res::Node *hull{main_scene.get_root()->add_child()}, *rear_turret{hull->add_child()}, *forward_turret{hull->add_child()};
 	hull->add_component<res::Drawable>();
 	rear_turret->add_component<res::Drawable>();
 	forward_turret->add_component<res::Drawable>();
 	hull->get_component<res::Drawable>()->set_shader(program);
 	rear_turret->get_component<res::Drawable>()->set_shader(program);
 	forward_turret->get_component<res::Drawable>()->set_shader(program);
+
+	res::Node *camera{rear_turret->add_child()};
+	camera->add_component<res::Camera>();
+	camera->get_component<res::Camera>()->set_active();
+	camera->set_main_transform(midnight::matrixTranslation(midnight::Vector3{0, 0.2, 0}));
+	camera->transform_priority(midnight::matrixRotation(midnight::Vector3{0, 0, 1}, -0.3));
+	camera->transform_priority(midnight::matrixRotation(midnight::Vector3{0, 1, 0}, std::numbers::pi_v<float> / -2));
+	camera->get_component<res::Camera>()->set_fov(2);
 	
 	res::ResourceController<res::ModelResource> mc;
 	mc.index("m_boat", "boat.obj");
@@ -103,11 +114,11 @@ int main()
 	rear_turret->get_component<res::Drawable>()->set_model(mc.retrieve("m_ags"));
 	forward_turret->get_component<res::Drawable>()->set_model(mc.retrieve("m_ags"));
 	
-	hull->set_transform(m);
-	rear_turret->set_transform(midnight::matrixTranslation(midnight::Vector3{-0.61, 0.15, 0}));
-	forward_turret->set_transform(midnight::matrixTranslation(midnight::Vector3{-1.15, 0.15, 0}));
-	rear_turret->set_transform(rear_turret->get_transform() * midnight::matrixRotation(midnight::Vector3{0, 1, 0}, std::numbers::pi_v<float> / -4));
-	forward_turret->set_transform(forward_turret->get_transform() * midnight::matrixRotation(midnight::Vector3{0, 1, 0}, std::numbers::pi_v<float> / 3));
+	hull->set_main_transform(m);
+	rear_turret->set_priority_transform(midnight::matrixRotation(midnight::Vector3{0, 1, 0}, std::numbers::pi_v<float> / -4));
+	forward_turret->set_priority_transform(midnight::matrixRotation(midnight::Vector3{0, 1, 0}, std::numbers::pi_v<float> / 3));
+	rear_turret->set_main_transform(midnight::matrixTranslation(midnight::Vector3{-0.61, 0.15, 0}));
+	forward_turret->set_main_transform(midnight::matrixTranslation(midnight::Vector3{-1.15, 0.15, 0}));
 
 	while (!glfwWindowShouldClose(mw)) {
 		gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
@@ -117,8 +128,8 @@ int main()
 		gl::glUniform3fv(gl::glGetUniformLocation(program, "u_light_dir"), 1, dir.dataPtr());
 		// m *= midnight::matrixRotation(midnight::Vector3{0, 1, 0}, 0.1);
 		
-		hull->cycle();
-		// hull->set_transform(m);
+		main_scene.cycle();
+		rear_turret->transform_priority(midnight::matrixRotation(midnight::Vector3{0, 1, 0}, 0.1));
 
 		glfwSwapBuffers(mw);
 		glfwPollEvents();

@@ -10,7 +10,7 @@ namespace res
 	class Drawable : public Component
 	{
 	public:
-		virtual void cycle() override;
+		virtual void cycle(const midnight::Matrix4x4 current_transform) override;
 		
 		void set_shader(const unsigned int shader);
 		void set_model(std::weak_ptr<res::ModelResource> model);
