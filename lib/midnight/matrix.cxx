@@ -67,6 +67,7 @@ namespace midnight
 			xl * zl * (f - 1),
 			yl * zl * (f - 1),
 			pow(zl, 2.0F) * (f - 1) + 1,
+			0,
 
 			0, 0, 0, 1
 		};
