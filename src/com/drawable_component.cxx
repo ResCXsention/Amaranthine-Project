@@ -23,7 +23,7 @@ namespace res
 	{
 		if (std::shared_ptr<res::ModelResource> locked_model{model.lock()}) {
 			if (shader != 0) {
-				std::vector<res::ModelResource::Mesh> meshes{locked_model->get_meshes()};
+				const std::vector<res::ModelResource::Mesh> &meshes{locked_model->get_meshes()};
 				for (auto &mesh : meshes) {
 					gl::glUseProgram(shader);
 

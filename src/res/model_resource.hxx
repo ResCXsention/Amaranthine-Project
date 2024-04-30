@@ -13,7 +13,7 @@ namespace res
 		class Mesh final
 		{
 		public:
-			explicit Mesh(
+			Mesh(
 					const std::vector<float> vertices,
 					const std::vector<float> normals,
 					const std::vector<unsigned int> indices
@@ -21,10 +21,11 @@ namespace res
 			Mesh(const Mesh &other);
 			~Mesh();
 
+			Mesh &operator=(const Mesh &other) = delete;
+
 			unsigned int get_vao() const;
 			unsigned int get_index_count() const;
 
-			Mesh &operator=(const Mesh &other) = delete;
 
 		private:
 			std::vector<float> vertices;
@@ -37,7 +38,7 @@ namespace res
 		virtual void load(const std::string path) override;
 		virtual void unload() override;
 
-		const std::vector<Mesh> get_meshes() const;
+		const std::vector<Mesh> &get_meshes() const;
 
 	private:
 		std::vector<Mesh> meshes;

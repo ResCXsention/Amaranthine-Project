@@ -55,10 +55,10 @@ namespace res
 
 	ModelResource::Mesh::~Mesh()
 	{
-		gl::glDeleteVertexArrays(1, &vao);
 		gl::glDeleteBuffers(1, &vbo);
 		gl::glDeleteBuffers(1, &ebo);
 		gl::glDeleteBuffers(1, &nbo);
+		gl::glDeleteVertexArrays(1, &vao);
 	}
 
 	unsigned int ModelResource::Mesh::get_vao() const
@@ -75,7 +75,7 @@ namespace res
 	{
 		static Assimp::Importer importer;
 		const aiScene *scene{importer.ReadFile(path, aiProcess_Triangulate)};
-		if (scene == nullptr) std::cout << importer.GetErrorString() << std::endl;
+		if (scene == nullptr) std::cerr << importer.GetErrorString() << std::endl;
 
 		load_ainode(scene->mRootNode, scene);
 	}
@@ -84,7 +84,7 @@ namespace res
 	{
 	}
 
-	const std::vector<ModelResource::Mesh> ModelResource::get_meshes() const
+	const std::vector<ModelResource::Mesh> &ModelResource::get_meshes() const
 	{
 		return meshes;
 	}
@@ -110,7 +110,7 @@ namespace res
 					indices.push_back(face.mIndices[j]);
 				}
 			}
-			meshes.push_back(Mesh(vertices, normals, indices));
+			meshes.emplace_back(vertices, normals, indices);
 		}
 		for (unsigned int i{0}; i < node->mNumChildren; ++i) {
 			load_ainode(node->mChildren[i], scene);
