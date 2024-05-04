@@ -82,13 +82,10 @@ int main()
 		gl::glDeleteShader(water_fragment_shader);
 
 		gl::glUseProgram(program);
-		midnight::Matrix4x4 m{midnight::matrixTranslation(midnight::Vector3{0, 0, -10})};
+		midnight::Matrix4x4 m{midnight::matrixTranslation(midnight::Vector3{0, 0, -3})};
 		m *= midnight::matrixRotation(midnight::Vector3{-1, 0, 0}, 0.1);
 		midnight::Matrix4x4 v{midnight::matrixIdentity<4>()};
 		midnight::Matrix4x4 p{midnight::matrixPerspective(0.57, default_win_w / default_win_h, 0.001F, 2000)};
-		// gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_model"), 1, false, m.dataPtr());
-		// gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_view"), 1, false, v.dataPtr());
-		// gl::glUniformMatrix4fv(gl::glGetUniformLocation(program, "u_projection"), 1, false, p.dataPtr());
 
 		res::Scene main_scene;
 
@@ -100,17 +97,16 @@ int main()
 		rear_turret->get_component<res::Drawable>()->set_shader(program);
 		forward_turret->get_component<res::Drawable>()->set_shader(program);
 
-		res::Node *camera{rear_turret->add_child()};
+		res::Node *camera{main_scene.get_root()->add_child()};
 		camera->add_component<res::Camera>();
 		camera->get_component<res::Camera>()->set_active();
-		camera->set_main_transform(midnight::matrixTranslation(midnight::Vector3{0, 0.2, 0}));
-		camera->transform_priority(midnight::matrixRotation(midnight::Vector3{0, 0, 1}, -0.3));
-		camera->transform_priority(midnight::matrixRotation(midnight::Vector3{0, 1, 0}, std::numbers::pi_v<float> / -2));
 		camera->get_component<res::Camera>()->set_fov(2);
 		
 		res::ResourceController<res::ModelResource> mc;
 		mc.index("m_boat", "boat.obj");
 		mc.index("m_ags", "ags.obj");
+		mc.index("m_hollow", "hollow.obj");
+		hull->get_component<res::Drawable>()->set_model(mc.retrieve("m_boat"));
 		hull->get_component<res::Drawable>()->set_model(mc.retrieve("m_boat"));
 		rear_turret->get_component<res::Drawable>()->set_model(mc.retrieve("m_ags"));
 		forward_turret->get_component<res::Drawable>()->set_model(mc.retrieve("m_ags"));
@@ -124,13 +120,23 @@ int main()
 		while (!glfwWindowShouldClose(mw)) {
 			gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
 
+			if (glfwGetKey(mw, GLFW_KEY_W) == GLFW_PRESS) {
+				camera->transform_main(midnight::matrixTranslation(midnight::Vector3{0, 0, -0.5}));
+			}  else if (glfwGetKey(mw, GLFW_KEY_S) == GLFW_PRESS) {
+				camera->transform_main(midnight::matrixTranslation(midnight::Vector3{0, 0, 0.5}));
+			} else if (glfwGetKey(mw, GLFW_KEY_A) == GLFW_PRESS) {
+				camera->transform_main(midnight::matrixTranslation(midnight::Vector3{-0.5, 0, 0}));
+			}  else if (glfwGetKey(mw, GLFW_KEY_D) == GLFW_PRESS) {
+				camera->transform_main(midnight::matrixTranslation(midnight::Vector3{0.5, 0, 0}));
+			} 
+
 			const float t{static_cast<const float>(glfwGetTime())};
 			midnight::Vector3 dir{midnight::cartesian3({1, std::sin(t), std::sin(t)})};
 			gl::glUniform3fv(gl::glGetUniformLocation(program, "u_light_dir"), 1, dir.dataPtr());
-			// m *= midnight::matrixRotation(midnight::Vector3{0, 1, 0}, 0.1);
 			
 			main_scene.cycle();
-			rear_turret->transform_priority(midnight::matrixRotation(midnight::Vector3{0, 1, 0}, 0.1));
+			// rear_turret->transform_priority(midnight::matrixRotation(midnight::Vector3{0, 1, 0}, 0.1));
+			// hull->transform_priority(midnight::matrixRotation(midnight::Vector3{0, 1, 0}, 0.1));
 
 			glfwSwapBuffers(mw);
 			glfwPollEvents();
